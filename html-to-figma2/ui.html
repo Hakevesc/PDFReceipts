@@ -1,0 +1,474 @@
+<![CDATA[<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 12px;
+    color: var(--figma-color-text, #1c1c21); background: var(--figma-color-bg, #fff);
+    display: flex; flex-direction: column; height: 100vh;
+  }
+  header { padding: 12px 14px 6px; }
+  h1 { font-size: 13px; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 7px; }
+  h1 .dot { width: 14px; height: 14px; border-radius: 4px; background: linear-gradient(135deg, #FE353D, #a259ff); }
+  .sub { color: var(--figma-color-text-secondary, #7c7c87); margin: 3px 0 0 21px; }
+
+  .body { flex: 1; overflow-y: auto; padding: 6px 14px 0; display: flex; flex-direction: column; }
+  .label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .6px;
+    color: var(--figma-color-text-secondary, #7c7c87); margin: 10px 0 5px; }
+
+  textarea {
+    width: 100%; min-height: 150px; flex: 1; resize: vertical;
+    font-family: 'SF Mono', Menlo, Consolas, monospace; font-size: 11px; line-height: 1.5;
+    padding: 9px; border-radius: 7px; border: 1px solid var(--figma-color-border, #e0e0e3);
+    background: var(--figma-color-bg-secondary, #fafafa); color: var(--figma-color-text, #1c1c21);
+  }
+  .row { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+  .file { font-size: 11px; }
+  input[type="text"], input[type="number"] {
+    border: 1px solid var(--figma-color-border, #e0e0e3); border-radius: 6px; padding: 5px 7px;
+    font-size: 11px; background: var(--figma-color-bg, #fff); color: var(--figma-color-text, #1c1c21);
+  }
+  input[type="text"] { flex: 1; min-width: 120px; }
+  input[type="number"] { width: 80px; }
+  .opt { display: flex; align-items: center; gap: 7px; cursor: pointer; }
+
+  .actions { display: flex; gap: 8px; padding: 10px 14px; }
+  .actions button { flex: 1; padding: 9px; border-radius: 7px; border: none; cursor: pointer; font-size: 12px; font-weight: 600; }
+  .primary { background: var(--figma-color-bg-brand, #0d99ff); color: #fff; }
+  .primary:disabled { opacity: .55; cursor: default; }
+  .ghost { background: var(--figma-color-bg-secondary, #f0f0f3); color: var(--figma-color-text, #1c1c21); }
+
+  .status { margin: 0 14px 10px; padding: 7px 10px; border-radius: 6px; font-size: 11px; display: none; }
+  .status.ok { display: block; background: #e7f7ec; color: #137a36; }
+  .status.err { display: block; background: #ffe8e8; color: #b00020; }
+  .status.work { display: block; background: var(--figma-color-bg-secondary, #f4f6f5); color: var(--figma-color-text-secondary, #555); }
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="dot"></span> M-PESA PDF Receipt Importer</h1>
+  <div class="sub">Paste PDF receipt HTML (A4 size) and rebuild it as exact Figma layers. All content, stamp, logo included.</div>
+</header>
+
+<div class="body">
+  <div class="label">HTML</div>
+  <textarea id="html" spellcheck="false" placeholder="Paste full PDF receipt HTML here…"></textarea>
+
+  <div class="row">
+    <input class="file" type="file" id="file" accept=".html,.htm,text/html">
+  </div>
+
+  <div class="label">Image assets (logo, QR, stamp, etc.) &mdash; optional, multi-select</div>
+  <div class="row">
+    <input class="file" type="file" id="images" accept="image/*" multiple>
+  </div>
+
+  <div class="label">Options</div>
+  <div class="row">
+    <span style="color:var(--figma-color-text-secondary,#7c7c87)">Root selector</span>
+    <input type="text" id="rootSel" placeholder="auto (e.g. .page)">
+  </div>
+  <div class="row">
+    <span style="color:var(--figma-color-text-secondary,#7c7c87)">Render width (A4 = 794px)</span>
+    <input type="number" id="rw" value="794" min="80" max="2000">
+    <label class="opt"><input type="checkbox" id="autoLayout" checked> Use Auto Layout</label>
+  </div>
+</div>
+
+<div class="actions">
+  <button class="primary" id="build">Build in Figma</button>
+  <button class="ghost" id="close">Close</button>
+</div>
+<div class="status" id="status"></div>
+
+<script>
+/* ============================================================
+   DOM serialiser (adapted from ../figma-export.js) — runs here in
+   the UI iframe, the only place with a real DOM to measure.
+   PDF-specific: root selector prioritises .page for A4 receipts
+   ============================================================ */
+var colorProbe = null;
+function parseCssColor(raw) {
+  if (!raw || raw === 'transparent' || raw === 'rgba(0, 0, 0, 0)') return null;
+  var m = raw.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+  if (!m) {
+    if (!colorProbe) { colorProbe = document.createElement('div'); colorProbe.style.display = 'none'; document.body.appendChild(colorProbe); }
+    colorProbe.style.color = ''; colorProbe.style.color = raw;
+    m = getComputedStyle(colorProbe).color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+    if (!m) return null;
+  }
+  return { r: +m[1] / 255, g: +m[2] / 255, b: +m[3] / 255, a: m[4] !== undefined ? +m[4] : 1 };
+}
+function parseGradient(bg) {
+  var m = bg.match(/linear-gradient\(([^)]+)\)/);
+  if (!m) return null;
+  var parts = m[1].split(/,(?![^(]*\))/);
+  var angleDeg = 180, colorStops = parts;
+  var angleMatch = parts[0].trim().match(/^([\d.]+)deg$/);
+  if (angleMatch) { angleDeg = parseFloat(angleMatch[1]); colorStops = parts.slice(1); }
+  else if (parts[0].trim().indexOf('to ') === 0) { colorStops = parts.slice(1); }
+  var stops = [];
+  colorStops.forEach(function (s, i) {
+    var t = s.trim();
+    var posMatch = t.match(/([\d.]+)%\s*$/);
+    var colorStr = posMatch ? t.slice(0, t.length - posMatch[0].length).trim() : t;
+    var position = posMatch ? parseFloat(posMatch[1]) / 100 : i / Math.max(colorStops.length - 1, 1);
+    var c = parseCssColor(colorStr);
+    if (c) stops.push({ color: c, position: position });
+  });
+  if (stops.length < 2) return null;
+  var rad = (angleDeg - 90) * Math.PI / 180;
+  return {
+    type: 'GRADIENT_LINEAR',
+    gradientHandlePositions: [
+      { x: 0.5 - Math.cos(rad) * 0.5, y: 0.5 - Math.sin(rad) * 0.5 },
+      { x: 0.5 + Math.cos(rad) * 0.5, y: 0.5 + Math.sin(rad) * 0.5 }
+    ],
+    gradientStops: stops
+  };
+}
+function parseBoxShadow(raw) {
+  if (!raw || raw === 'none') return [];
+  var effects = [], parts = raw.split(/,(?![^(]*\))/);
+  for (var i = 0; i < parts.length; i++) {
+    var p = parts[i].trim();
+    var inset = p.indexOf('inset') !== -1;
+    var colorMatch = p.match(/rgba?\([^)]+\)|#[0-9a-fA-F]{3,8}/);
+    var nums = p.replace(/rgba?\([^)]+\)/, '').match(/(-?[\d.]+)px/g);
+    if (!colorMatch || !nums || nums.length < 2) continue;
+    var c = parseCssColor(colorMatch[0]);
+    if (!c) continue;
+    effects.push({
+      type: inset ? 'INNER_SHADOW' : 'DROP_SHADOW', color: c,
+      offset: { x: parseFloat(nums[0]), y: parseFloat(nums[1]) },
+      radius: nums[2] ? parseFloat(nums[2]) : 0, spread: nums[3] ? parseFloat(nums[3]) : 0, visible: true
+    });
+  }
+  return effects;
+}
+function mapFontWeight(w) {
+  var n = parseInt(w, 10);
+  if (!isNaN(n)) return n;
+  return ({ normal: 400, bold: 700, lighter: 300, bolder: 700 })[w] || 400;
+}
+function extractAutoLayout(style) {
+  var disp = style.display;
+  if (disp !== 'flex' && disp !== 'inline-flex') return null;
+  var horizontal = (style.flexDirection || 'row').indexOf('row') === 0;
+  var gap = parseFloat(horizontal ? style.columnGap : style.rowGap);
+  if (isNaN(gap)) gap = 0;
+  var primaryMap = {
+    'flex-start': 'MIN', 'start': 'MIN', 'left': 'MIN', 'normal': 'MIN',
+    'center': 'CENTER', 'flex-end': 'MAX', 'end': 'MAX', 'right': 'MAX',
+    'space-between': 'SPACE_BETWEEN', 'space-around': 'SPACE_BETWEEN', 'space-evenly': 'SPACE_BETWEEN'
+  };
+  var counterMap = {
+    'flex-start': 'MIN', 'start': 'MIN', 'normal': 'MIN', 'stretch': 'MIN',
+    'center': 'CENTER', 'flex-end': 'MAX', 'end': 'MAX', 'baseline': 'BASELINE'
+  };
+  return {
+    direction: horizontal ? 'HORIZONTAL' : 'VERTICAL', itemSpacing: gap,
+    paddingTop: parseFloat(style.paddingTop) || 0, paddingRight: parseFloat(style.paddingRight) || 0,
+    paddingBottom: parseFloat(style.paddingBottom) || 0, paddingLeft: parseFloat(style.paddingLeft) || 0,
+    primaryAlign: primaryMap[style.justifyContent] || 'MIN',
+    counterAlign: counterMap[style.alignItems] || 'MIN',
+    wrap: horizontal && style.flexWrap === 'wrap'
+  };
+}
+function iconToPng(el, style, rect) {
+  try {
+    var pseudo = getComputedStyle(el, '::before');
+    var content = pseudo.getPropertyValue('content');
+    if (!content || content === 'none' || content === 'normal') return null;
+    var glyph = content.replace(/^["']|["']$/g, '');
+    if (!glyph) return null;
+    var fs = parseFloat(pseudo.fontSize || style.fontSize) || 16;
+    var fam = pseudo.fontFamily || style.fontFamily;
+    var c = document.createElement('canvas');
+    var w = Math.max(2, Math.round(rect.width * 2)), h = Math.max(2, Math.round(rect.height * 2));
+    c.width = w; c.height = h;
+    var cx = c.getContext('2d');
+    cx.font = (pseudo.fontWeight || '400') + ' ' + (fs * 2) + 'px ' + fam;
+    cx.fillStyle = style.color; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    cx.fillText(glyph, w / 2, h / 2);
+    return c.toDataURL('image/png');
+  } catch (e) { return null; }
+}
+function imgToPng(el, rect) {
+  try {
+    var c = document.createElement('canvas');
+    c.width = Math.max(2, Math.round(rect.width * 2)); c.height = Math.max(2, Math.round(rect.height * 2));
+    c.getContext('2d').drawImage(el, 0, 0, c.width, c.height);
+    return c.toDataURL('image/png');
+  } catch (e) { return null; }
+}
+function rasterizeSvg(svgEl) {
+  return new Promise(function (resolve) {
+    try {
+      var rect = svgEl.getBoundingClientRect();
+      if (rect.width < 1 || rect.height < 1) return resolve(null);
+      var clone = svgEl.cloneNode(true);
+      clone.setAttribute('width', rect.width); clone.setAttribute('height', rect.height);
+      if (!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      clone.setAttribute('style', 'color:' + getComputedStyle(svgEl).color);
+      var xml = new XMLSerializer().serializeToString(clone);
+      var img = new Image();
+      img.onload = function () {
+        try {
+          var c = document.createElement('canvas');
+          c.width = Math.max(2, Math.round(rect.width * 2)); c.height = Math.max(2, Math.round(rect.height * 2));
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          resolve(c.toDataURL('image/png'));
+        } catch (e) { resolve(null); }
+      };
+      img.onerror = function () { resolve(null); };
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
+    } catch (e) { resolve(null); }
+  });
+}
+function rasterizeVisibleSvgs(root) {
+  var svgs = root.querySelectorAll('svg'), map = new Map(), jobs = [];
+  svgs.forEach(function (svg) {
+    var rect = svg.getBoundingClientRect();
+    if (rect.width < 1 || rect.height < 1) return;
+    jobs.push(rasterizeSvg(svg).then(function (data) { if (data) map.set(svg, data); }));
+  });
+  return Promise.all(jobs).then(function () { return map; });
+}
+function measureTextNode(textNode, elRect, style) {
+  var raw = textNode.textContent;
+  if (!raw || !raw.replace(/\s+/g, '')) return null;
+  var r;
+  try {
+    var range = document.createRange();
+    range.selectNode(textNode);
+    r = range.getBoundingClientRect();
+    if (range.detach) range.detach();
+  } catch (e) { r = elRect; }
+  if (!r || r.width < 1 || r.height < 1) return null;
+  return {
+    type: 'TEXT', name: 'text', text: raw.replace(/\s+/g, ' ').trim(),
+    x: Math.round(r.left - elRect.left), y: Math.round(r.top - elRect.top),
+    w: Math.ceil(r.width) + 1, h: Math.ceil(r.height),
+    fontSize: parseFloat(style.fontSize) || 14, fontWeight: mapFontWeight(style.fontWeight),
+    fontFamily: style.fontFamily.split(',')[0].replace(/['"]/g, '').trim() || 'Inter',
+    color: parseCssColor(style.color) || { r: 0, g: 0, b: 0, a: 1 },
+    lineHeight: style.lineHeight === 'normal' ? null : parseFloat(style.lineHeight),
+    textAlign: style.textAlign === 'center' ? 'CENTER' : style.textAlign === 'right' ? 'RIGHT' : 'LEFT',
+    letterSpacing: parseFloat(style.letterSpacing) || 0
+  };
+}
+var SKIP_TAGS = { script: 1, style: 1, link: 1, meta: 1, template: 1, title: 1, head: 1, noscript: 1 };
+
+// CSS rotation is clockwise-positive; combined translate+rotate sometimes
+// resolves to matrix3d(...) instead of matrix(...), but in both forms the
+// first two values are still m11, m12, which fully determine a pure Z rotation.
+function rotationDegrees(transform) {
+  if (!transform || transform === 'none') return 0;
+  var m = transform.match(/matrix(3d)?\(([^)]+)\)/);
+  if (!m) return 0;
+  var parts = m[2].split(',').map(function (s) { return parseFloat(s.trim()); });
+  return Math.atan2(parts[1], parts[0]) * (180 / Math.PI);
+}
+
+function serializeElement(el, containerRect, depth, svgMap) {
+  if (depth > 24) return null;
+  if (SKIP_TAGS[el.tagName.toLowerCase()]) return null;
+  var rect = el.getBoundingClientRect();
+  if (rect.width < 1 || rect.height < 1) return null;
+  var style = getComputedStyle(el);
+  if (style.display === 'none' || style.visibility === 'hidden') return null;
+  if (parseFloat(style.opacity) === 0) return null;
+
+  var tag = el.tagName.toLowerCase();
+  var cls = el.className && typeof el.className === 'string' ? el.className.split(/\s+/)[0] : '';
+  var name = cls || tag;
+
+  // getBoundingClientRect() returns the rotated (axis-aligned) bbox. CSS
+  // rotation pivots around the element's own center by default, so the center
+  // point is identical before/after rotation — reconstruct the unrotated box
+  // from offsetWidth/Height and that shared center, then rotate it in Figma.
+  var rotation = rotationDegrees(style.transform);
+  var left = rect.left, top = rect.top, w = rect.width, h = rect.height;
+  if (rotation !== 0 && el.offsetWidth && el.offsetHeight) {
+    var cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+    w = el.offsetWidth; h = el.offsetHeight;
+    left = cx - w / 2; top = cy - h / 2;
+  }
+
+  var node = {
+    type: 'FRAME', name: name,
+    x: Math.round(left - containerRect.left), y: Math.round(top - containerRect.top),
+    w: Math.round(w), h: Math.round(h),
+    rotation: rotation,
+    fills: [], strokes: [], effects: [],
+    cornerRadius: [
+      parseFloat(style.borderTopLeftRadius) || 0, parseFloat(style.borderTopRightRadius) || 0,
+      parseFloat(style.borderBottomRightRadius) || 0, parseFloat(style.borderBottomLeftRadius) || 0
+    ],
+    opacity: parseFloat(style.opacity),
+    clipsContent: style.overflow === 'hidden' || style.overflow === 'clip' ||
+                  style.overflowX === 'hidden' || style.overflowY === 'hidden',
+    absolute: style.position === 'absolute' || style.position === 'fixed',
+    autoLayout: extractAutoLayout(style),
+    children: []
+  };
+
+  var bgColor = style.backgroundColor;
+  if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
+    var c = parseCssColor(bgColor); if (c) node.fills.push({ type: 'SOLID', color: c });
+  }
+  var bgImage = style.backgroundImage;
+  if (bgImage && bgImage !== 'none') { var grad = parseGradient(bgImage); if (grad) node.fills.push(grad); }
+
+  var bw = parseFloat(style.borderTopWidth);
+  if (bw > 0 && style.borderTopStyle !== 'none') {
+    var bc = parseCssColor(style.borderTopColor);
+    if (bc) node.strokes.push({ type: 'SOLID', color: bc, weight: bw });
+  }
+  node.effects = parseBoxShadow(style.boxShadow);
+
+  if (tag === 'i') {
+    var png = iconToPng(el, style, rect);
+    if (png) { node.name = 'icon-' + ((el.className.match(/ti-([^\s]+)/) || ['', 'glyph'])[1]); node.imageData = png; node.fills = []; node.autoLayout = null; return node; }
+  }
+  if (tag === 'svg') {
+    node.name = 'icon-svg';
+    if (svgMap && svgMap.get(el)) node.imageData = svgMap.get(el);
+    node.fills = []; node.autoLayout = null; return node;
+  }
+  if (tag === 'img') {
+    node.name = 'image';
+    var imgPng = imgToPng(el, rect);
+    if (imgPng) node.imageData = imgPng;
+    node.autoLayout = null; return node;
+  }
+
+  for (var i = 0; i < el.childNodes.length; i++) {
+    var n = el.childNodes[i];
+    if (n.nodeType === 3) {
+      var textChild = measureTextNode(n, rect, style);
+      if (textChild) node.children.push(textChild);
+    } else if (n.nodeType === 1) {
+      var child = serializeElement(n, containerRect, depth + 1, svgMap);
+      if (child) { child.x -= node.x; child.y -= node.y; node.children.push(child); }
+    }
+  }
+  return node;
+}
+function serializeRoot(rootEl, containerRect, svgMap) { return serializeElement(rootEl, containerRect, 0, svgMap); }
+
+/* ============================================================
+   UI controller — PDF receipt specific
+   ============================================================ */
+var $ = function (id) { return document.getElementById(id); };
+function status(kind, text) { var s = $('status'); s.className = 'status ' + kind; s.textContent = text; }
+function setBuilding(on) { var b = $('build'); b.disabled = on; b.textContent = on ? 'Building…' : 'Build in Figma'; }
+function delay(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+function raf2() { return new Promise(function (r) { requestAnimationFrame(function () { requestAnimationFrame(r); }); }); }
+
+$('file').addEventListener('change', function () {
+  var f = this.files && this.files[0]; if (!f) return;
+  var reader = new FileReader();
+  reader.onload = function () { $('html').value = reader.result; status('work', 'Loaded ' + f.name); };
+  reader.readAsText(f);
+});
+
+// <img src="assets/foo.png"> can never resolve inside the plugin UI iframe (it
+// has no access to the project folder), so the image never decodes and
+// imgToPng() always comes back empty. Let the user pick the referenced files
+// and inline them as data URLs before the HTML is rendered.
+var imageMap = {}; // filename -> data URL
+function fileToDataUrl(file) {
+  return new Promise(function (resolve, reject) {
+    var r = new FileReader();
+    r.onload = function () { resolve(r.result); };
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+$('images').addEventListener('change', async function () {
+  var files = Array.prototype.slice.call(this.files || []);
+  for (var i = 0; i < files.length; i++) {
+    imageMap[files[i].name] = await fileToDataUrl(files[i]);
+  }
+  status('work', Object.keys(imageMap).length + ' image(s) loaded');
+});
+function inlineImageSrcs(html) {
+  return html.replace(/(<img[^>]*\bsrc=["'])([^"']+)(["'])/gi, function (m, pre, src, post) {
+    var name = src.split('/').pop();
+    return imageMap[name] ? (pre + imageMap[name] + post) : m;
+  });
+}
+
+function pickRoot(shadow) {
+  var sel = ($('rootSel').value || '').trim();
+  if (sel) { try { var e = shadow.querySelector(sel); if (e) return e; } catch (_) {} }
+  // PDF receipts use .page as their A4 container — prioritise it
+  var order = ['.page', '.receipt-card', '.phone-frame', '.phone', '.screen', '.sc', '[data-root]', 'main', '.app', '.container', '.card'];
+  for (var i = 0; i < order.length; i++) { var el = shadow.querySelector(order[i]); if (el) return el; }
+  var kids = [];
+  for (var j = 0; j < shadow.children.length; j++) {
+    var ch = shadow.children[j];
+    if (!SKIP_TAGS[ch.tagName.toLowerCase()]) kids.push(ch);
+  }
+  if (kids.length === 1) return kids[0];
+  if (kids.length === 0) return null;
+  var wrap = document.createElement('div');
+  kids.forEach(function (k) { wrap.appendChild(k); });
+  shadow.appendChild(wrap);
+  return wrap;
+}
+
+$('build').addEventListener('click', async function () {
+  var html = $('html').value.trim();
+  if (!html) { status('err', 'Paste some HTML or load a file first.'); return; }
+  setBuilding(true);
+  status('work', 'Rendering & measuring…');
+
+  var rw = Math.max(80, parseInt($('rw').value, 10) || 794);
+  var host = document.createElement('div');
+  host.style.cssText = 'position:fixed;left:0;top:0;opacity:0;pointer-events:none;z-index:-1;overflow:visible;width:' + rw + 'px;';
+  document.body.appendChild(host);
+  var shadow = host.attachShadow({ mode: 'open' });
+  shadow.innerHTML = inlineImageSrcs(html);
+
+  try {
+    await raf2();
+    try { if (document.fonts && document.fonts.ready) await Promise.race([document.fonts.ready, delay(1500)]); } catch (e) {}
+    await delay(120);
+
+    var root = pickRoot(shadow);
+    if (!root) { throw new Error('Could not find a root element to import.'); }
+    var containerRect = root.getBoundingClientRect();
+    if (containerRect.width < 1 || containerRect.height < 1) { throw new Error('The rendered HTML has no visible size.'); }
+
+    var svgMap;
+    try { svgMap = await rasterizeVisibleSvgs(root); } catch (e) { svgMap = new Map(); }
+    var tree = serializeRoot(root, containerRect, svgMap);
+    if (!tree) { throw new Error('Nothing visible to import.'); }
+
+    parent.postMessage({ pluginMessage: { type: 'build', tree: tree, options: { autoLayout: $('autoLayout').checked } } }, '*');
+    status('work', 'Building in Figma…');
+  } catch (err) {
+    setBuilding(false);
+    status('err', err.message || String(err));
+  } finally {
+    host.remove();
+  }
+});
+
+$('close').addEventListener('click', function () { parent.postMessage({ pluginMessage: { type: 'close' } }, '*'); });
+
+onmessage = function (e) {
+  var m = e.data.pluginMessage; if (!m) return;
+  setBuilding(false);
+  if (m.type === 'done') status('ok', 'Imported “' + m.name + '” into Figma.');
+  else if (m.type === 'error') status('err', m.message);
+};
+</script>
+</body>
+</html>
+]]>
