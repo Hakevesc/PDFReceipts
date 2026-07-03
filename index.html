@@ -1,0 +1,368 @@
+<![CDATA[<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M-PESA PDF Receipts</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600&display=swap');
+  @import url('https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700&display=swap');
+
+  :root {
+    --Primary: #FE353D;
+    --Primary-Dark: #C41520;
+    --On-Surface: #1C1C21;
+    --On-Surface-Low: #7C7C87;
+    --Surface-Container: #FCFCFC;
+    --Border: #E8E8EC;
+    --Success: #1FC83B;
+    --Gray-0: #FFF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #F5F5F5;
+    color: var(--On-Surface);
+    min-height: 100vh;
+    padding: 30px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .container {
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--Border);
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo {
+    height: 36px;
+    width: auto;
+  }
+
+  .header h1 {
+    font-family: 'Switzer', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--On-Surface);
+  }
+
+  .header .sub {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--On-Surface-Low);
+  }
+
+  .count-badge {
+    background: var(--Primary);
+    color: #FFF;
+    font-family: 'Switzer', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* Category Section */
+  .category {
+    margin-bottom: 32px;
+  }
+
+  .category-title {
+    font-family: 'Switzer', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--On-Surface);
+    margin-bottom: 12px;
+    padding-left: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .category-title .cat-count {
+    font-size: 12px;
+    color: var(--On-Surface-Low);
+    font-weight: 400;
+  }
+
+  .receipt-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .receipt-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    background: var(--Gray-0);
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--On-Surface);
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+  }
+
+  .receipt-item:hover {
+    border-color: var(--Primary);
+    box-shadow: 0 2px 12px rgba(254, 53, 61, 0.1);
+    transform: translateX(4px);
+  }
+
+  .receipt-item:active {
+    transform: scale(0.99);
+  }
+
+  .receipt-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #FFF1F2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .receipt-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--Primary);
+    fill: none;
+    stroke-width: 2;
+  }
+
+  .receipt-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .receipt-name {
+    font-family: 'Switzer', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--On-Surface);
+    letter-spacing: 0.1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .receipt-file {
+    font-size: 11px;
+    color: var(--On-Surface-Low);
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .receipt-arrow {
+    width: 18px;
+    height: 18px;
+    stroke: var(--On-Surface-Low);
+    fill: none;
+    stroke-width: 2;
+    flex-shrink: 0;
+    transition: transform 0.15s;
+  }
+
+  .receipt-item:hover .receipt-arrow {
+    transform: translateX(3px);
+    stroke: var(--Primary);
+  }
+
+  /* Footer */
+  .footer-note {
+    text-align: center;
+    padding: 20px 0 10px;
+    font-size: 12px;
+    color: var(--On-Surface-Low);
+    font-weight: 400;
+    border-top: 1px solid var(--Border);
+    margin-top: 16px;
+  }
+
+  .footer-note a {
+    color: var(--Primary);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .footer-note a:hover {
+    text-decoration: underline;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    body { padding: 16px; }
+    .header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .receipt-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <img src="assets/M-PESA-red-logo.svg" alt="M-PESA" class="logo" onerror="this.style.display='none'">
+      <div>
+        <h1>PDF Receipts</h1>
+        <div class="sub">M-PESA transaction receipts & statements</div>
+      </div>
+    </div>
+    <span class="count-badge" id="totalCount">0 receipts</span>
+  </div>
+
+  <!-- Agency Banking -->
+  <div class="category">
+    <div class="category-title">Agency Banking <span class="cat-count" id="agencyCount"></span></div>
+    <div class="receipt-grid" id="agencyList"></div>
+  </div>
+
+  <!-- Cash In / Cash Out -->
+  <div class="category">
+    <div class="category-title">Cash Transactions <span class="cat-count" id="cashCount"></span></div>
+    <div class="receipt-grid" id="cashList"></div>
+  </div>
+
+  <!-- Pay Utility -->
+  <div class="category">
+    <div class="category-title">Pay Utility <span class="cat-count" id="utilityCount"></span></div>
+    <div class="receipt-grid" id="utilityList"></div>
+  </div>
+
+  <!-- Sell -->
+  <div class="category">
+    <div class="category-title">Sell & Distribute <span class="cat-count" id="sellCount"></span></div>
+    <div class="receipt-grid" id="sellList"></div>
+  </div>
+
+  <!-- Business -->
+  <div class="category">
+    <div class="category-title">Business <span class="cat-count" id="businessCount"></span></div>
+    <div class="receipt-grid" id="businessList"></div>
+  </div>
+
+  <!-- Customer -->
+  <div class="category">
+    <div class="category-title">Customer <span class="cat-count" id="customerCount"></span></div>
+    <div class="receipt-grid" id="customerList"></div>
+  </div>
+
+  <!-- Merchant -->
+  <div class="category">
+    <div class="category-title">Merchant <span class="cat-count" id="merchantCount"></span></div>
+    <div class="receipt-grid" id="merchantList"></div>
+  </div>
+
+  <div class="footer-note">
+    M-PESA — <a href="index.html">Home</a>
+  </div>
+
+</div>
+
+<script>
+  // PDF icon SVG
+  const pdfIcon = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>';
+
+  // Arrow SVG
+  const arrowSvg = '<svg class="receipt-arrow" viewBox="0 0 24 24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+
+  const receipts = [
+    // Group: Agency Banking
+    { name: 'Agency Banking Cash In', file: 'Agency Banking Cashin Recipet PDF.html', group: 'agency' },
+    { name: 'Agency Banking Cashout', file: 'Agency Banking Cashout Recipet PDF.html', group: 'agency' },
+    { name: 'Agency Banking Transaction Receipt', file: 'Agency Banking Transaction Receipt PDF.html', group: 'agency' },
+
+    // Group: Cash
+    { name: 'Cash In', file: 'Cashin Recipet PDF.html', group: 'cash' },
+    { name: 'Cashout', file: 'Cashout Recipet PDF.html', group: 'cash' },
+
+    // Group: Pay Utility
+    { name: 'Pay Utility DSTV', file: 'Pay Utility DSTV Recipet PDF.html', group: 'utility' },
+    { name: 'Pay Utility EEU', file: 'Pay Utility EEU Recipet PDF.html', group: 'utility' },
+    { name: 'Pay Utility ET', file: 'Pay Utility Recipet PDF.html', group: 'utility' },
+    { name: 'Pay Utility School', file: 'Pay Utility School Recipet PDF.html', group: 'utility' },
+    { name: 'Pay Utility Water', file: 'Pay Utility Water Recipet PDF.html', group: 'utility' },
+
+    // Group: Sell
+    { name: 'Sell Airtime', file: 'Sell Airtime Recipet PDF.html', group: 'sell' },
+    { name: 'Sell Float', file: 'Sell Float Recipet PDF.html', group: 'sell' },
+    { name: 'Sell Package', file: 'Sell Package Recipet PDF.html', group: 'sell' },
+    { name: 'Distribute Float', file: 'Distribute Float Recipet PDF.html', group: 'sell' },
+
+    // Group: Business
+    { name: 'Agency Banking Cash In_Business', file: 'Agency Banking Cashin_Business.html', group: 'business' },
+    { name: 'Agency Banking Cashout_Business', file: 'Agency Banking Cashout_Business.html', group: 'business' },
+
+    // Group: Customer
+    { name: 'Cash In_Customer', file: 'Cashin M-PESA_Customer.html', group: 'customer' },
+    { name: 'Cashout_Customer', file: 'Cashout M-PESA_Customer.html', group: 'customer' },
+    { name: 'Pay Utility DSTV_Customer', file: 'Pay Utility DSTV_Customer.html', group: 'customer' },
+    { name: 'Pay Utility EEU_Customer', file: 'Pay Utility EEU_Customer.html', group: 'customer' },
+    { name: 'Pay Utility ET_Customer', file: 'Pay Utility ET_Customer.html', group: 'customer' },
+    { name: 'Pay Utility School_Customer', file: 'Pay Utility School_Customer.html', group: 'customer' },
+    { name: 'Pay Utility Water_Customer', file: 'Pay Utility Water_Customer.html', group: 'customer' },
+
+    // Group: Merchant
+    { name: 'Merchant to Bank', file: 'Merchant to Bank PDF.html', group: 'merchant' },
+  ];
+
+  function renderList(id, items) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = items.map(r => `
+      <a class="receipt-item" href="${r.file}">
+        <div class="receipt-icon">${pdfIcon}</div>
+        <div class="receipt-info">
+          <div class="receipt-name">${r.name}</div>
+          <div class="receipt-file">${r.file}</div>
+        </div>
+        ${arrowSvg}
+      </a>
+    `).join('');
+    const countEl = el.parentElement.querySelector('.cat-count');
+    if (countEl) countEl.textContent = `(${items.length})`;
+  }
+
+  renderList('agencyList', receipts.filter(r => r.group === 'agency'));
+  renderList('cashList', receipts.filter(r => r.group === 'cash'));
+  renderList('utilityList', receipts.filter(r => r.group === 'utility'));
+  renderList('sellList', receipts.filter(r => r.group === 'sell'));
+  renderList('businessList', receipts.filter(r => r.group === 'business'));
+  renderList('customerList', receipts.filter(r => r.group === 'customer'));
+  renderList('merchantList', receipts.filter(r => r.group === 'merchant'));
+
+  document.getElementById('totalCount').textContent = receipts.length + ' receipts';
+</script>
+</body>
+</html>
+]]>

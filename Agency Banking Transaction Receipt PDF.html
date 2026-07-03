@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M-PESA Agency Banking — Transaction Receipt</title>
+<style>
+ @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
+
+ 
+ * { margin: 0; padding: 0; box-sizing: border-box; }
+
+ body {
+ font-family: 'Inter', Arial, sans-serif;
+ background: #E8E8E8;
+ 
+ 
+ color: #1C1C21;
+ }
+
+ .page { width: 793.7px; height: 1122.5px; background: #FFF; position: relative; padding: 45.4px 52.9px; display: flex; flex-direction: column; padding-bottom: 75.6px; }
+
+ /* ===== WATERMARK ===== */
+ .mpesa-watermark-text {
+ position: absolute;
+ top: 50%;
+ left: 50%;
+ transform: translate(-50%, -50%) rotate(-25deg);
+ font-family: 'Poppins', sans-serif;
+ font-size: 140px;
+ font-weight: 900;
+ color: rgba(76, 175, 80, 0.09);
+ letter-spacing: 12px;
+ white-space: nowrap;
+ pointer-events: none;
+ z-index: 0;
+ 
+ user-select: none;
+ }
+
+ /* ===== HEADER ===== */
+ .header {
+ position: relative; z-index: 1;
+ display: flex;
+ justify-content: space-between;
+ align-items: flex-start;
+ margin-bottom: 15.1px;
+ padding-bottom: 15.1px;
+ border-bottom: 1px solid #E0E0E0;
+ }
+
+ .header-left { flex: 1; }
+ .mpesa-logo { height: 56.7px; width: auto; margin-bottom: 11.3px; }
+
+ .company-name {
+ font-family: 'Poppins', sans-serif;
+ font-size: 14px; font-weight: 700; color: #1C1C21; margin-bottom: 7.6px;
+ }
+
+ .company-details { font-size: 12px; color: #1C1C21; line-height: 2.2; font-weight: 400; }
+ .company-details .lbl { font-weight: 400; color: #777; }
+ .company-details .val { font-weight: 700; color: #1C1C21; }
+
+ .qr-section { text-align: center; flex-shrink: 0; }
+ .qr-code {
+ width: 90.7px; height: 90.7px; background: #FFF;
+ border: 1px solid #E0E0E0;
+ display: flex; align-items: center; justify-content: center;
+ margin-bottom: 5.7px;
+ }
+ .qr-code img { width: 100%; height: 100%; object-fit: contain; }
+ .qr-label { font-size: 8.7px; font-weight: 600; color: #555; letter-spacing: 0.5px; }
+
+ /* ===== TITLE BOX ===== */
+ .title-box {
+ position: relative; z-index: 1;
+ border: 2px solid #2E7D32;
+ padding: 9.4px 0;
+ text-align: center;
+ margin: 15.1px 0 18.9px;
+ }
+
+ .title-box h1 {
+ font-family: 'Poppins', sans-serif;
+ font-size: 16px; font-weight: 700;
+ color: #2E7D32; letter-spacing: 1.5px; text-transform: uppercase;
+ }
+
+ /* ===== SECTIONS ===== */
+ .receipt-section {
+ position: relative; z-index: 1;
+ margin-bottom: 15.1px;
+ border: 1px solid #E0E0E0;
+ }
+
+ .section-title {
+ background: #F5F5F5;
+ padding: 7.6px 13.2px;
+ border-bottom: 1px solid #E0E0E0;
+ }
+
+ .section-title h2 {
+ font-family: 'Poppins', sans-serif;
+ font-size: 11.3px; font-weight: 700;
+ color: #1C1C21; letter-spacing: 1px; text-transform: uppercase;
+ }
+
+ /* ===== INFO ROWS ===== */
+ .info-row {
+ display: flex;
+ padding: 7.6px 13.2px;
+ gap: 15.1px;
+ font-size: 11.3px;
+ border-bottom: 1px solid #F0F0F0;
+ align-items: flex-start;
+ }
+
+ .info-row:last-child { border-bottom: none; }
+
+ .info-label {
+ min-width: 234.3px;
+ color: #555;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.3px;
+ font-size: 10px;
+ padding-top: 1.9px;
+ flex-shrink: 0;
+ }
+
+ .info-value {
+ flex: 1;
+ color: #1C1C21;
+ font-weight: 600;
+ font-size: 11.3px;
+ word-break: break-word;
+ }
+
+ .info-value.mono {
+ font-family: 'Poppins', sans-serif;
+ letter-spacing: 0.2px;
+ }
+
+ /* ===== AMOUNT TABLE ===== */
+ .amount-table {
+ width: 100%;
+ border-collapse: collapse;
+ font-size: 11.3px;
+ }
+
+ .amount-table td {
+ padding: 7.6px 13.2px;
+ border-bottom: 1px solid #F0F0F0;
+ }
+
+ .amount-table td.lbl {
+ color: #555; font-weight: 500;
+ text-transform: uppercase; letter-spacing: 0.3px;
+ font-size: 10px; width: 234.3px;
+ }
+
+ .amount-table td.val {
+ text-align: right; font-weight: 700;
+ color: #1C1C21; font-family: 'Poppins', sans-serif;
+ }
+
+ .amount-table tr:last-child td { border-bottom: none; }
+
+ .amount-table tr.total-row td {
+ background: #E8F5E9;
+ padding-top: 9.4px; padding-bottom: 9.4px;
+ }
+
+ .amount-table tr.total-row td.lbl {
+ font-family: 'Poppins', sans-serif;
+ font-weight: 800; color: #1B5E20; font-size: 12px;
+ text-transform: uppercase; letter-spacing: 0.5px;
+ }
+
+ .amount-table tr.total-row td.val {
+ font-size: 16px; font-weight: 800; color: #2E7D32;
+ }
+
+ /* Amount in Words row */
+ .words-row {
+ background: #F9FBF9;
+ border-top: 1px solid #E0E0E0;
+ }
+
+ .words-row td {
+ padding: 7.6px 13.2px;
+ font-size: 10.7px;
+ }
+
+ .words-row .words-lbl {
+ color: #555; font-weight: 500;
+ text-transform: uppercase; font-size: 10px;
+ letter-spacing: 0.3px;
+ }
+
+ .words-row .words-val {
+ font-style: italic; color: #1C1C21;
+ font-weight: 600;
+ }
+
+ /* ===== STAMP ===== */
+ .stamp-watermark {
+ position: absolute;
+ top: 566.9px; right: 68px;
+ width: 245.7px; height: 245.7px;
+ opacity: 0.92;
+ 
+ pointer-events: none;
+ z-index: 2;
+ transform: rotate(-12deg);
+ }
+ .stamp-watermark img { width: 100%; height: 100%; object-fit: contain; }
+
+ /* ===== FOOTER TEXT ===== */
+ .footer-text { text-align: center; padding: 13.2px 0 9.4px; margin-top: auto; border-top: 1px solid #E0E0E0; font-size: 10.7px; color: #1C1C21; font-weight: 500; letter-spacing: 0.3px; }
+
+ /* ===== FOOTER BAR ===== */
+ .footer-bar { position: absolute; bottom: 0; left: 0; right: 0; background: #4CAF50; padding: 11.3px 22.7px; display: flex; justify-content: space-between; align-items: center; z-index: 2; }
+
+ .footer-bar .fb-note {
+ color: rgba(255,255,255,0.92);
+ font-size: 9.3px; font-weight: 600; letter-spacing: 0.5px;
+ }
+
+ .footer-bar img {
+ height: 30.2px; width: auto;
+ 
+ }
+
+ @media print {
+ body { background: #FFF; padding: 0; }
+ .page { width: 793.7px; height: 1122.5px; display: flex; flex-direction: column; padding-bottom: 75.6px; }
+ }
+
+ @media screen and (max-width: 800px) {
+ .page { width: 100%; min-height: auto; display: flex; flex-direction: column; padding-bottom: 75.6px; }
+ body { }
+ }
+</style>
+</head>
+<body>
+
+<div class="page" id="receiptPage">
+
+  <!-- Diagonal Watermark -->
+  <div class="mpesa-watermark-text">M-PESA</div>
+
+  <!-- Official Stamp -->
+  <div class="stamp-watermark">
+    <img src="assets/M-PESA-official_stamp.png" alt="M-PESA Official Stamp">
+  </div>
+
+  <!-- ===== HEADER ===== -->
+  <div class="header">
+    <div class="header-left">
+      <img src="assets/M-PESA-red-logo.svg" alt="M-PESA" class="mpesa-logo">
+      <div class="company-name">Safaricom M-PESA Mobile Financial Services PLC</div>
+      <div class="company-details">
+        <span class="lbl">TIN NO:</span> <span class="val">0084242753</span><br>
+        <span class="lbl">VAT REG NO:</span> <span class="val">22371880003</span><br>
+        <span class="lbl">Address:</span> <span class="val">Addis Ababa, Kirkos Woreda 1</span><br>
+        <span class="lbl">Tel:</span> <span class="val">+251 756 765434</span>
+      </div>
+    </div>
+    <div class="qr-section">
+      <div class="qr-code">
+        <img src="assets/qr-placeholder.svg" alt="QR Code" >
+      </div>
+      <div class="qr-label">SCAN TO VERIFY</div>
+    </div>
+  </div>
+
+  <!-- ===== TITLE BOX ===== -->
+  <div class="title-box">
+    <h1>Agency Banking Transaction Receipt</h1>
+  </div>
+
+  <!-- ===== SECTION 1: TRANSACTION PARTIES ===== -->
+  <div class="receipt-section">
+    <div class="section-title"><h2>Transaction Parties</h2></div>
+
+    <div class="info-row">
+      <span class="info-label">Sender Bank</span>
+      <span class="info-value">CBE</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Sender Bank Account Number</span>
+      <span class="info-value mono">**** **** 1234 &bull; Abebe Kebede</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Receiver Name</span>
+      <span class="info-value">Betty Merhat Agency</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Receiver Short Code</span>
+      <span class="info-value mono">876543</span>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2: TRANSACTION INFORMATION ===== -->
+  <div class="receipt-section">
+    <div class="section-title"><h2>Transaction Information</h2></div>
+
+    <div class="info-row">
+      <span class="info-label">Amount</span>
+      <span class="info-value mono">ETB 2,000.00</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Bank Transaction ID</span>
+      <span class="info-value mono">BNK-TXN-98765432</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Transaction ID</span>
+      <span class="info-value mono">fxt45632578</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Transaction Detail</span>
+      <span class="info-value">Agency Banking Cashout &mdash; CBE</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Receipt Number</span>
+      <span class="info-value mono">RCP-2024-12345678</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Transaction Date</span>
+      <span class="info-value">12/12/2024 at 8:34 AM</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Used Channel</span>
+      <span class="info-value">M-PESA App</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Transaction Reason</span>
+      <span class="info-value">Cash Withdrawal</span>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 3: AMOUNT BREAKDOWN ===== -->
+  <div class="receipt-section">
+    <div class="section-title"><h2>Amount Breakdown</h2></div>
+
+    <table class="amount-table">
+      <tr>
+        <td class="lbl">Withdraw Amount</td>
+        <td class="val">ETB 2,000.00</td>
+      </tr>
+      <tr>
+        <td class="lbl">Service Fee</td>
+        <td class="val">ETB 35.00</td>
+      </tr>
+      <tr>
+        <td class="lbl">VAT</td>
+        <td class="val">ETB 6.30</td>
+      </tr>
+      <tr class="total-row">
+        <td class="lbl">Total Amount</td>
+        <td class="val">ETB 2,041.30</td>
+      </tr>
+      <tr class="words-row">
+        <td class="words-lbl">Total Amount in Word</td>
+        <td class="words-val">Two Thousand Forty-One &amp; 30/100 Ethiopian Birr Only</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ===== FOOTER TEXT ===== -->
+  <div class="footer-text">
+    M-PESAን ስለተጠቀሙ አመሰግናለን &nbsp;/&nbsp; THANK YOU FOR USING M-PESA AGENCY BANKING
+  </div>
+
+  <!-- ===== FOOTER BAR ===== -->
+  <div class="footer-bar">
+    <span class="fb-note">M-PESA Agency Banking</span>
+    <img src="assets/M-PESA-white-logo.svg" alt="M-PESA">
+  </div>
+
+</div>
+
+</body>
+</html>

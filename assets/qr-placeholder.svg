@@ -1,0 +1,30 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#FFFFFF"/>
+  <!-- Top-left finder -->
+  <rect x="10" y="10" width="50" height="50" fill="#1C1C21"/>
+  <rect x="20" y="20" width="30" height="30" fill="#FFFFFF"/>
+  <rect x="28" y="28" width="14" height="14" fill="#1C1C21"/>
+  <!-- Top-right finder -->
+  <rect x="140" y="10" width="50" height="50" fill="#1C1C21"/>
+  <rect x="150" y="20" width="30" height="30" fill="#FFFFFF"/>
+  <rect x="158" y="28" width="14" height="14" fill="#1C1C21"/>
+  <!-- Bottom-left finder -->
+  <rect x="10" y="140" width="50" height="50" fill="#1C1C21"/>
+  <rect x="20" y="150" width="30" height="30" fill="#FFFFFF"/>
+  <rect x="28" y="158" width="14" height="14" fill="#1C1C21"/>
+  <!-- Timing / data modules -->
+  <g fill="#1C1C21">
+    <rect x="70" y="14" width="10" height="10"/><rect x="90" y="14" width="10" height="10"/><rect x="110" y="14" width="10" height="10"/>
+    <rect x="70" y="30" width="10" height="10"/><rect x="110" y="30" width="10" height="10"/>
+    <rect x="14" y="70" width="10" height="10"/><rect x="30" y="70" width="10" height="10"/><rect x="70" y="70" width="10" height="10"/><rect x="90" y="70" width="10" height="10"/><rect x="130" y="70" width="10" height="10"/><rect x="150" y="70" width="10" height="10"/><rect x="170" y="70" width="10" height="10"/>
+    <rect x="30" y="90" width="10" height="10"/><rect x="70" y="90" width="10" height="10"/><rect x="110" y="90" width="10" height="10"/><rect x="130" y="90" width="10" height="10"/><rect x="170" y="90" width="10" height="10"/>
+    <rect x="14" y="110" width="10" height="10"/><rect x="50" y="110" width="10" height="10"/><rect x="90" y="110" width="10" height="10"/><rect x="110" y="110" width="10" height="10"/><rect x="150" y="110" width="10" height="10"/>
+    <rect x="70" y="130" width="10" height="10"/><rect x="90" y="130" width="10" height="10"/><rect x="130" y="130" width="10" height="10"/><rect x="150" y="130" width="10" height="10"/><rect x="170" y="130" width="10" height="10"/>
+    <rect x="70" y="150" width="10" height="10"/><rect x="110" y="150" width="10" height="10"/><rect x="130" y="150" width="10" height="10"/><rect x="170" y="150" width="10" height="10"/>
+    <rect x="90" y="170" width="10" height="10"/><rect x="110" y="170" width="10" height="10"/><rect x="150" y="170" width="10" height="10"/><rect x="170" y="170" width="10" height="10"/>
+  </g>
+  <!-- Center logo plate -->
+  <rect x="80" y="80" width="40" height="40" rx="6" fill="#FFFFFF"/>
+  <rect x="84" y="84" width="32" height="32" rx="4" fill="#FE353D"/>
+  <text x="100" y="106" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">M</text>
+</svg>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M-PESA Pay Utility EEU Receipt</title>
+<style>
+ @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+ 
+
+ * { margin: 0; padding: 0; box-sizing: border-box; }
+
+ body {
+ font-family: 'Inter', Arial, sans-serif;
+ background: #E8E8E8;
+ 
+ 
+ color: #1C1C21;
+ }
+
+ .page { width: 793.7px; height: 1122.5px; background: #FFF; position: relative; padding: 45.4px 52.9px; display: flex; flex-direction: column; padding-bottom: 75.6px; }
+
+ /* ===== HEADER ===== */
+ .header {
+ display: flex;
+ justify-content: space-between;
+ align-items: flex-start;
+ margin-bottom: 15.1px;
+ padding-bottom: 15.1px;
+ border-bottom: 1px solid #E0E0E0;
+ }
+
+ .header-left { flex: 1; }
+ .mpesa-logo { height: 56.7px; width: auto; margin-bottom: 11.3px; }
+ .company-name { font-family: 'Poppins', sans-serif; font-size: 14.7px; font-weight: 700; color: #1C1C21; margin-bottom: 7.6px; }
+ .company-details { font-size: 13.3px; color: #1C1C21; line-height: 2.3; font-weight: 400; }
+ .company-details .label { font-weight: 400; color: #666; letter-spacing: 0.3px; }
+ .company-details .bold-val { font-weight: 700; color: #1C1C21; }
+
+ .qr-section { text-align: center; }
+ .qr-code { width: 94.5px; height: 94.5px; background: #FFF; border: 1px solid #E0E0E0; display: flex; align-items: center; justify-content: center; margin-bottom: 3.8px; }
+ .qr-code img { width: 100%; height: 100%; object-fit: contain; }
+ .qr-label { font-size: 9.3px; font-weight: 600; color: #1C1C21; letter-spacing: 0.5px; }
+
+ /* ===== TITLE BOX ===== */
+ .title-box { border: 2px solid #FE353D; padding: 9.4px 0; text-align: center; margin: 15.1px 0 22.7px; }
+ .title-box h1 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; color: #FE353D; letter-spacing: 1.5px; text-transform: uppercase; }
+
+ /* ===== TRANSACTION INFO ===== */
+ .transaction-info { margin-bottom: 22.7px; }
+ .info-row { display: flex; padding: 5.7px 0; gap: 11.3px; font-size: 12px; }
+ .info-label { min-width: 272.1px; color: #1C1C21; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
+ .info-label .amharic { font-weight: 400; color: #555; }
+ .info-value { flex: 1; color: #1C1C21; font-weight: 600; }
+
+ /* ===== TRANSACTION DETAIL TABLE ===== */
+ .detail-section { margin-bottom: 22.7px; }
+ .section-header { background: #F5F5F5; padding: 7.6px 11.3px; text-align: center; margin-bottom: 7.6px; }
+ .section-header h2 { font-family: 'Poppins', sans-serif; font-size: 13.3px; font-weight: 700; color: #1C1C21; letter-spacing: 1px; text-transform: uppercase; }
+
+ .detail-table { width: 100%; border-collapse: collapse; font-size: 11.3px; }
+ .detail-table th { background: #F5F5F5; padding: 7.6px 7.6px; text-align: left; font-weight: 600; color: #1C1C21; border: 1px solid #E0E0E0; }
+ .detail-table th:last-child { text-align: right; }
+ .detail-table td { padding: 7.6px 7.6px; border: 1px solid #E0E0E0; vertical-align: middle; }
+ .detail-table td:last-child { text-align: right; font-weight: 600; }
+ .detail-table .amount-cell { font-family: 'Poppins', sans-serif; font-weight: 600; }
+ .total-row td { background: #FFF1F2; font-weight: 700; font-size: 12px; color: #FE353D; }
+
+ /* ===== ADDITIONAL INFO ===== */
+ .additional-info { margin-bottom: 22.7px; padding-top: 15.1px; border-top: 1px solid #E0E0E0; }
+ .info-group { display: flex; padding: 5.7px 0; gap: 11.3px; font-size: 12px; }
+ .info-group .label { min-width: 272.1px; color: #1C1C21; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
+ .info-group .label .amharic { font-weight: 400; color: #555; }
+ .info-group .value { flex: 1; color: #1C1C21; font-weight: 600; }
+ .amount-words { font-style: italic; color: #1C1C21; font-weight: 600; }
+
+ /* ===== STAMP ===== */
+ .stamp-watermark { position: absolute; top: 597.2px; right: 68px; width: 249.4px; height: 249.4px; opacity: 0.95; pointer-events: none; z-index: 101; transform: rotate(-12deg); }
+ .stamp-watermark img { width: 100%; height: 100%; object-fit: contain; }
+
+ /* ===== FOOTER ===== */
+ .footer { text-align: center; padding: 15.1px 0 11.3px; margin-top: auto; border-top: 1px solid #E0E0E0; font-size: 11.3px; color: #1C1C21; font-weight: 500; letter-spacing: 0.5px; }
+ .footer-bar { position: absolute; bottom: 0; left: 0; right: 0; background: #FE353D; padding: 11.3px 22.7px; display: flex; justify-content: flex-end; align-items: center; }
+ .footer-bar img { height: 30.2px; width: auto; }
+
+ /* Watermark */
+ .mpesa-watermark-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-25deg); font-family: 'Poppins', sans-serif; font-size: 140px; font-weight: 900; color: rgba(180, 180, 180, 0.2); letter-spacing: 12px; white-space: nowrap; pointer-events: none; z-index: 100; user-select: none; }
+
+ @media print { body { background: #FFF; padding: 0; } .page { width: 793.7px; height: 1122.5px; display: flex; flex-direction: column; padding-bottom: 75.6px; } }
+ @media screen and (max-width: 800px) { .page { width: 100%; min-height: auto; display: flex; flex-direction: column; padding-bottom: 75.6px; } body { } }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="mpesa-watermark-text">M-PESA</div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <img src="assets/M-PESA-red-logo.svg" alt="M-PESA" class="mpesa-logo">
+      <div class="company-name">Safaricom M-PESA Mobile Financial Services PLC</div>
+      <div class="company-details">
+        <span class="label">TIN NO:</span> <span class="bold-val">0084242753</span><br>
+        <span class="label">VAT REG NO:</span> <span class="bold-val">22371880003</span><br>
+        <span class="label">Address:</span> <span class="bold-val">Addis Ababa, Kirkos Woreda 1</span><br>
+        <span class="label">Tel:</span> <span class="bold-val">+251 756 765434</span>
+      </div>
+    </div>
+    <div class="qr-section">
+      <div class="qr-code">
+        <img src="assets/qr-placeholder.svg" alt="QR Code" >
+      </div>
+      <div class="qr-label">SCAN TO VERIFY</div>
+    </div>
+  </div>
+
+  <!-- Title Box -->
+  <div class="title-box"><h1>TRANSACTION INFORMATION</h1></div>
+
+  <!-- Transaction Information -->
+  <div class="transaction-info">
+    <div class="info-row">
+      <span class="info-label"><span class="amharic">የከፋዩ ስም /</span> PAYER NAME</span>
+      <span class="info-value">Betty Merhat Agency</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label"><span class="amharic">የከፋዩ አጭር ኮድ /</span> PAYER SHORT CODE</span>
+      <span class="info-value">876543</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label"><span class="amharic">የደንበኛ ስም /</span> CUSTOMER NAME</span>
+      <span class="info-value">Kidist Alemayehu Tadesse</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label"><span class="amharic">የውል ቁጥር /</span> REFERENCE / CONTRACT NUMBER</span>
+      <span class="info-value">CT-2024-1234567</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label"><span class="amharic">የከፋዩ TIN ቁጥር /</span> PAYER TIN NO</span>
+      <span class="info-value">0098765432</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label"><span class="amharic">የተቀባይ ድርጅት ስም /</span> RECEIVER BUSINESS NAME</span>
+      <span class="info-value">Ethiopian Electric Utility (EEU)</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label"><span class="amharic">የክፍያ ወር /</span> BILL MONTH</span>
+      <span class="info-value">May-26</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label"><span class="amharic">መጠን /</span> AMOUNT</span>
+      <span class="info-value">1,500.00 BIRR</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label"><span class="amharic">የግብይት መታወቂያ /</span> TRANSACTION ID</span>
+      <span class="info-value">EEU44332211</span>
+    </div>
+  </div>
+
+  <!-- Transaction Detail Table -->
+  <div class="detail-section">
+    <div class="section-header"><h2>TRANSACTION DETAIL</h2></div>
+    <table class="detail-table">
+      <thead>
+        <tr>
+          <th style="width: 33%;"><span class="amharic">ደረሰኝ ቁጥር /</span> RECEIPT NO</th>
+          <th style="width: 33%;"><span class="amharic">የክፍያ ቀን /</span> PAYMENT DATE</th>
+          <th style="width: 34%;"><span class="amharic">ጠቅላላ የክፍያ መጠን /</span> TOTAL BILL AMOUNT</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>RCP-2024-44332211</td>
+          <td>12-12-2024 18:30:00</td>
+          <td class="amount-cell">1,500.00 BIRR</td>
+        </tr>
+        <tr>
+          <td colspan="2" style="text-align: right; padding-right: 15.1px;">የአገልግሎት ክፍያ / SERVICE FEE</td>
+          <td class="amount-cell">15.00 BIRR</td>
+        </tr>
+        <tr>
+          <td colspan="2" style="text-align: right; padding-right: 15.1px;">15% VAT</td>
+          <td class="amount-cell">2.70 BIRR</td>
+        </tr>
+        <tr class="total-row">
+          <td colspan="2" style="text-align: right; padding-right: 15.1px;">ጠቅላላ / TOTAL AMOUNT</td>
+          <td class="amount-cell">1,517.70 BIRR</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Additional Information -->
+  <div class="additional-info">
+    <div class="info-group">
+      <span class="label"><span class="amharic">ጠቅላላ መጠን በቃላት /</span> TOTAL AMOUNT IN WORD</span>
+      <span class="value amount-words">One Thousand Five Hundred Seventeen Birr and Seventy Cents Only</span>
+    </div>
+    <div class="info-group">
+      <span class="label"><span class="amharic">የክፍያ መንገድ /</span> PAYMENT CHANNEL</span>
+      <span class="value">M-PESA App</span>
+    </div>
+    <div class="info-group">
+      <span class="label"><span class="amharic">የክፍያ ምክንያት /</span> PAYMENT REASON</span>
+      <span class="value">Electricity Bill Payment</span>
+    </div>
+  </div>
+
+  <!-- Stamp -->
+  <div class="stamp-watermark">
+    <img src="assets/M-PESA-official_stamp.png" alt="M-PESA Stamp">
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    M-PESAን ስለተጠቀሙ እናመሰግናለን / THANK YOU FOR USING M-PESA
+  </div>
+
+  <!-- Footer Bar -->
+  <div class="footer-bar">
+    <img src="assets/M-PESA-white-logo.svg" alt="M-PESA">
+  </div>
+</div>
+
+</body>
+</html>

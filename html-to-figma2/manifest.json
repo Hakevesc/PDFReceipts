@@ -1,0 +1,13 @@
+{
+  "name": "M-PESA PDF Receipt Importer",
+  "id": "mpesa-pdf-receipt-importer",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "capabilities": [],
+  "networkAccess": {
+    "allowedDomains": ["*"],
+    "reasoning": "PDF receipt HTML may pull in webfonts, stylesheets or images from CDNs; these must load in the plugin UI so the layout can be measured accurately."
+  }
+}
