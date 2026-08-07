@@ -21,8 +21,8 @@
  .qr-code { width: 94.5px; height: 94.5px; background: #FFF; border: 1px solid #E0E0E0; display: flex; align-items: center; justify-content: center; margin-bottom: 3.8px; }
  .qr-code img { width: 100%; height: 100%; object-fit: contain; }
  .qr-label { font-size: 9.3px; font-weight: 600; color: #1C1C21; letter-spacing: 0.5px; }
- .title-box { border: 2px solid #FE353D; padding: 9.4px 0; text-align: center; margin: 15.1px 0 22.7px; }
- .title-box h1 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; color: #FE353D; letter-spacing: 1.5px; text-transform: uppercase; }
+ .title-box { border: 2px solid #00A651; padding: 9.4px 0; text-align: center; margin: 15.1px 0 22.7px; }
+ .title-box h1 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; color: #00A651; letter-spacing: 1.5px; text-transform: uppercase; }
  .transaction-info { margin-bottom: 22.7px; }
  .info-row { display: flex; padding: 5.7px 0; gap: 61.2px; font-size: 12px; }
  .info-label { min-width: 272.1px; color: #1C1C21; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
@@ -37,18 +37,18 @@
  .detail-table td { padding: 7.6px 7.6px; border: 1px solid #E0E0E0; vertical-align: middle; }
  .detail-table td:last-child { text-align: right; font-weight: 600; }
  .detail-table .amount-cell { font-family: 'Poppins', sans-serif; font-weight: 600; }
- .total-row td { background: #FFF1F2; font-weight: 700; font-size: 12px; color: #FE353D; }
+ .total-row td { background: #E8F5EE; font-weight: 700; font-size: 12px; color: #00A651; }
  .additional-info { margin-bottom: 22.7px; padding-top: 15.1px; border-top: 1px solid #E0E0E0; }
  .info-group { display: flex; padding: 5.7px 0; gap: 61.2px; font-size: 12px; }
  .info-group .label { min-width: 272.1px; color: #1C1C21; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
  .info-group .label .amharic { font-weight: 400; color: #555; }
 .info-group .value { flex: 1; color: #1C1C21; font-weight: 600; }
  .amount-words { font-style: italic; color: #1C1C21; font-weight: 600; }
- .stamp-watermark { position: absolute; top: 597.2px; right: 68px; width: 249.4px; height: 249.4px; opacity: 0.95; pointer-events: none; z-index: 101; transform: rotate(-12deg); }
+ .stamp-watermark { position: absolute; top: 760px; right: 68px; width: 249.4px; height: 249.4px; opacity: 0.95; pointer-events: none; z-index: 101; transform: rotate(-12deg); mix-blend-mode: multiply; }
  .stamp-watermark img { width: 100%; height: 100%; object-fit: contain; }
  .footer { text-align: center; padding: 15.1px 0 11.3px; border-top: 1px solid #E0E0E0; font-size: 11.3px; color: #1C1C21; font-weight: 500; letter-spacing: 0.5px; margin-top: auto; }
- .footer-bar { position: absolute; bottom: 0; left: 0; right: 0; background: #FE353D; padding: 11.3px 22.7px; display: flex; justify-content: flex-end; align-items: center; }
- .footer-bar img { height: 30.2px; width: auto; }
+ .footer-bar { position: absolute; bottom: 0; left: 0; right: 0; background: #00A651; padding: 11.3px 22.7px; display: flex; justify-content: flex-end; align-items: center; }
+ .footer-bar img { height: 39.69px; width: auto; filter: brightness(0) invert(1); }
  .mpesa-watermark-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-25deg); font-family: 'Poppins', sans-serif; font-size: 140px; font-weight: 900; color: rgba(180, 180, 180, 0.2); letter-spacing: 12px; white-space: nowrap; pointer-events: none; z-index: 100; user-select: none; }
  @media print { body { background: #FFF; padding: 0; } .page { box-shadow: none; width: 793.7px; min-height: 1122.5px; } }
  @media screen and (max-width: 800px) { .page { width: 100%; min-height: auto; } body { padding: 10px; } }
@@ -62,58 +62,47 @@
       <img src="assets/M-PESA-red-logo.svg" alt="M-PESA" class="mpesa-logo">
       <div class="company-name">Safaricom M-PESA Mobile Financial Services PLC</div>
       <div class="company-details">
-        <span class="label">TIN NO:</span> <span class="bold-val">0084242753</span><br>
-        <span class="label">VAT REG NO:</span> <span class="bold-val">22371880003</span><br>
-        <span class="label">Address:</span> <span class="bold-val">Addis Ababa, Kirkos Woreda 1</span><br>
-        <span class="label">Merchant Shortcode/OwnerNumber:</span> <span class="bold-val">75489/+2517125110</span>
+        <span class="label">TIN NO:</span> <span class="bold-val">0093041627</span><br>
+        <span class="label">VAT REG NO:</span> <span class="bold-val">N/A</span><br>
+        <span class="label">Address:</span> <span class="bold-val">Mesqel Square, Bahirdar, Ethiopia</span>
       </div>
-    </div>
-    <div class="qr-section">
-      <div class="qr-code">
-        <img src="assets/qr-placeholder.svg" alt="QR Code">
-      </div>
-      <div class="qr-label">SCAN TO VERIFY</div>
     </div>
   </div>
   <div class="title-box"><h1>TRANSACTION INFORMATION</h1></div>
   <div class="transaction-info">
-    <div class="info-row"><span class="info-label"><span class="amharic">የላኪ ስም /</span> SENDER NAME</span><span class="info-value">Betty Merhat Agency</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">የላኪ አጭር ኮድ /</span> SENDER SHORT CODE</span><span class="info-value">876543</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">የተቀባይ ባንክ ስም /</span> RECEIVER BANK NAME</span><span class="info-value">CBE</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">የተቀባይ ባንክ ሂሳብ ቁጥር /</span><br> RECEIVER BANK ACCOUNT NUMBER</span><span class="info-value">100022925678 / Abebe Kebede</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">መጠን /</span> AMOUNT</span><span class="info-value">2,000.00 BIRR</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">የግብይት መታወቂያ /</span> TRANSACTION ID</span><span class="info-value">ACIB56789012</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">የግብይት ዝርዝር /</span> TRANSACTION DETAIL</span><span class="info-value">Cash Deposit to Bank</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የከፋዩ ስም /</span> PAYER NAME</span><span class="info-value">Abiy Bekele Fesha</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የከፋዩ አጭር ኮድ /</span> PAYER SHORT CODE</span><span class="info-value">251704344999</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የደንበኛ ስም /</span> CUSTOMER NAME</span><span class="info-value">Safaricom Telecommunication Ethiopia</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የውል ቁጥር /</span> REFERENCE</span><span class="info-value">37281513681</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የከፋዩ TIN ቁጥር /</span> PAYER TIN NO</span><span class="info-value">0093041627</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የተቀባይ ድርጅት ስም /</span> RECEIVER BUSINESS NAME</span><span class="info-value">Ethiopian Electric Utility (EEU)</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የክፍያ ወር /</span> BILL MONTH</span><span class="info-value">June-06</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">መጠን /</span> AMOUNT</span><span class="info-value">10,000.00 BIRR</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የግብይት መታወቂያ /</span> TRANSACTION ID</span><span class="info-value">UH52FKISV0</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የግብይት ዝርዝር /</span> TRANSACTION DETAIL</span><span class="info-value">Electricity Bill Payment</span></div>
   </div>
   <div class="detail-section">
     <div class="section-header"><h2>TRANSACTION DETAIL</h2></div>
     <table class="detail-table">
-      <thead><tr><th style="width: 33%;"><span class="amharic">ደረሰኝ ቁጥር /</span> RECEIPT NO</th><th style="width: 33%;"><span class="amharic">የግብይት ቀንና ሰዓት /</span> TRANSACTION DATE AND TIME</th><th style="width: 34%;"><span class="amharic">መጠን /</span> AMOUNT</th></tr></thead>
+      <thead><tr><th style="width: 33%;"><span class="amharic">ደረሰኝ ቁጥር /</span> RECEIPT NO</th><th style="width: 33%;"><span class="amharic">የክፍያ ቀን /</span> PAYMENT DATE</th><th style="width: 34%;"><span class="amharic">ጠቅላላ የክፍያ መጠን /</span> TOTAL BILL AMOUNT</th></tr></thead>
       <tbody>
-        <tr><td>RCP-2024-BIZ56789</td><td>12-12-2024 09:15:00</td><td class="amount-cell">2,000.00 BIRR</td></tr>
-        <tr><td colspan="2" style="text-align: right; padding-right: 15.1px;">የአገልግሎት ክፍያ / SERVICE FEE</td><td class="amount-cell">10.00 BIRR</td></tr>
-        <tr><td colspan="2" style="text-align: right; padding-right: 15.1px;">የኮሚሽን ክፍያ / COMMISSION FEE</td><td class="amount-cell">3.60 BIRR</td></tr>
-        <tr><td colspan="2" style="text-align: right; padding-right: 15.1px;">15% VAT</td><td class="amount-cell">2.44 BIRR</td></tr>
-        <tr class="total-row"><td colspan="2" style="text-align: right; padding-right: 15.1px;">ጠቅላላ / TOTAL AMOUNT</td><td class="amount-cell">2,016.04 BIRR</td></tr>
+        <tr><td>RCP-2024-CUST45678</td><td>5/8/26 at 5:53 PM</td><td class="amount-cell">10,000.00 BIRR</td></tr>
+        <tr><td colspan="2" style="text-align: right; padding-right: 15.1px;">የአገልግሎት ክፍያ / SERVICE FEE</td><td class="amount-cell">1.00 BIRR</td></tr>
+        <tr class="total-row"><td colspan="2" style="text-align: right; padding-right: 15.1px;">ጠቅላላ / TOTAL AMOUNT</td><td class="amount-cell">10,001.00 BIRR</td></tr>
       </tbody>
     </table>
   </div>
   <div class="additional-info">
-    <div class="info-group"><span class="label"><span class="amharic">ጠቅላላ መጠን በቃላት /</span> TOTAL AMOUNT IN WORD</span><span class="value">Two Thousand Sixteen Birr and Four Cents Only</span></div>
-    <div class="info-group"><span class="label"><span class="amharic">የተቀናሽ ሂሳብ /</span> DEBIT ACCOUNT</span><span class="value">M-PESA Float A/C - 876543</span></div>
-    <div class="info-group"><span class="label"><span class="amharic">የግብይት ዓይነት /</span> TRANSACTION TYPE</span><span class="value">Agency Banking - Cash In</span></div>
-    <div class="info-group"><span class="label"><span class="amharic">የግብይት መነሻ /</span> USED CHANNEL</span><span class="value">M-PESA App</span></div>
-    <div class="info-group"><span class="label"><span class="amharic">የግብይት ምክንያት /</span> TRANSACTION REASON</span><span class="value">Cash Deposit to Bank Account</span></div>
+    <div class="info-group"><span class="label"><span class="amharic">ጠቅላላ መጠን በቃላት /</span> TOTAL AMOUNT IN WORD</span><span class="value">Ten Thousand One Birr Only</span></div>
+    <div class="info-group"><span class="label"><span class="amharic">የተቀናሽ ሂሳብ /</span> DEBIT ACCOUNT</span><span class="value">N/A</span></div>
+    <div class="info-group"><span class="label"><span class="amharic">የግብይት ዓይነት /</span> TRANSACTION TYPE</span><span class="value">Pay Utility - EEU</span></div>
+    <div class="info-group"><span class="label"><span class="amharic">የክፍያ መንገድ /</span> PAYMENT CHANNEL</span><span class="value">USSD</span></div>
+    <div class="info-group"><span class="label"><span class="amharic">የክፍያ ምክንያት /</span> PAYMENT REASON</span><span class="value">Electricity Bill Payment</span></div>
   </div>
 
   <div class="stamp-watermark"><img src="assets/M-PESA-official_stamp.png" alt="M-PESA Stamp"></div>
   <div class="footer">M-PESAን ስለተጠቀሙ እናመሰግናለን / THANK YOU FOR USING M-PESA</div>
-  <div class="footer-bar"><img src="assets/M-PESA-white-logo.svg" alt="M-PESA"></div>
+  <div class="footer-bar"><img src="assets/M-PESA-red-logo.svg" alt="M-PESA"></div>
 </div>
 </body>
 </html>
-
-
-
-
-
