@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M-PESA Receipt Template - Pay Utility EEU (Customer)</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ===== editor toolbar (screen only, never printed / exported) ===== -->
+<div class="toolbar" id="toolbar">
+  <div class="brand">M-PESA Receipt Template<span>Pay Utility EEU &mdash; Customer</span></div>
+  <button type="button" class="btn btn-outline" id="btn-edit">Edit</button>
+  <button type="button" class="btn btn-primary" id="btn-update" disabled>Update</button>
+  <button type="button" class="btn" id="btn-print">Print</button>
+  <button type="button" class="btn btn-primary" id="btn-download">Download A4 PDF</button>
+  <button type="button" class="btn btn-outline" id="btn-reset" title="Restore the original template values">Reset</button>
+</div>
+
+<!-- ===== receipt (A4: 793.7 x 1122.5 px @96dpi = 210 x 297 mm) ===== -->
+<div class="page" id="receipt">
+  <!-- decorative: deliberately not editable so the watermark can't be disturbed -->
+  <div class="mpesa-watermark-text">M-PESA</div>
+
+  <div class="header">
+    <div class="header-left">
+      <!-- explicit width/height: html2canvas mis-sizes auto-scaled SVGs on export -->
+      <img src="assets/M-PESA-red-logo.svg" alt="M-PESA" class="mpesa-logo" width="208" height="56.7">
+      <!-- fixed company identity: deliberately NOT editable -->
+      <div class="company-name">Safaricom M-PESA Mobile Financial Services PLC</div>
+      <div class="company-details">
+        <span class="label">TIN NO:</span> <span class="bold-val">0084242753</span><br>
+        <span class="label">VAT REG NO:</span> <span class="bold-val">22371880003</span><br>
+        <span class="label">Address:</span> <span class="bold-val">Addis Ababa, Kirkos Woreda 1</span><br>
+        <span class="label">Tel:</span> <span class="bold-val">+251 756 765434</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="title-box"><h1 data-editable data-field="title">TRANSACTION INFORMATION</h1></div>
+
+  <!-- Every label and value below is editable. Values carrying sample data are
+       marked data-required: Update warns while they are still untouched. -->
+  <div class="transaction-info">
+    <div class="info-row"><span class="info-label" data-editable data-field="l-payer-name"><span class="amharic">የከፋዩ ስም /</span> PAYER NAME</span><span class="info-value" data-editable data-required data-field="payer-name">Payer Full Name</span></div>
+    <div class="info-row"><span class="info-label" data-editable data-field="l-payer-short-code"><span class="amharic">የከፋዩ አጭር ኮድ /</span> PAYER SHORT CODE</span><span class="info-value" data-editable data-required data-field="payer-short-code">2517XXXXXXXX</span></div>
+    <div class="info-row"><span class="info-label" data-editable data-field="l-customer-name"><span class="amharic">የደንበኛ ስም /</span> CUSTOMER NAME</span><span class="info-value" data-editable data-required data-field="customer-name">Customer / Business Name</span></div>
+    <div class="info-row"><span class="info-label" data-editable data-field="l-reference"><span class="amharic">የውል ቁጥር /</span> REFERENCE</span><span class="info-value" data-editable data-required data-field="reference">00000000000</span></div>
+    <div class="info-row"><span class="info-label" data-editable data-field="l-payer-tin"><span class="amharic">የከፋዩ TIN ቁጥር /</span> PAYER TIN NO</span><span class="info-value" data-editable data-required data-field="payer-tin">0000000000</span></div>
+    <div class="info-row"><span class="info-label" data-editable data-field="l-receiver-business"><span class="amharic">የተቀባይ ድርጅት ስም /</span> RECEIVER BUSINESS NAME</span><span class="info-value" data-editable data-field="receiver-business">Ethiopian Electric Utility (EEU)</span></div>
+    <div class="info-row"><span class="info-label" data-editable data-field="l-bill-month"><span class="amharic">የክፍያ ወር /</span> BILL MONTH</span><span class="info-value" data-editable data-required data-field="bill-month">Month-00</span></div>
+    <div class="info-row"><span class="info-label" data-editable data-field="l-amount"><span class="amharic">መጠን /</span> AMOUNT</span><span class="info-value" data-editable data-required data-field="amount">0.00 BIRR</span></div>
+    <div class="info-row"><span class="info-label" data-editable data-field="l-transaction-id"><span class="amharic">የግብይት መታወቂያ /</span> TRANSACTION ID</span><span class="info-value" data-editable data-required data-field="transaction-id">XXXXXXXXXX</span></div>
+    <div class="info-row"><span class="info-label" data-editable data-field="l-transaction-detail"><span class="amharic">የግብይት ዝርዝር /</span> TRANSACTION DETAIL</span><span class="info-value" data-editable data-field="transaction-detail">Electricity Bill Payment</span></div>
+  </div>
+
+  <div class="detail-section">
+    <div class="section-header"><h2 data-editable data-field="detail-heading">TRANSACTION DETAIL</h2></div>
+    <table class="detail-table">
+      <thead><tr>
+        <th style="width: 33%;" data-editable data-field="th-receipt-no"><span class="amharic">ደረሰኝ ቁጥር /</span> RECEIPT NO</th>
+        <th style="width: 33%;" data-editable data-field="th-payment-date"><span class="amharic">የክፍያ ቀን /</span> PAYMENT DATE</th>
+        <th style="width: 34%;" data-editable data-field="th-total-bill"><span class="amharic">ጠቅላላ የክፍያ መጠን /</span> TOTAL BILL AMOUNT</th>
+      </tr></thead>
+      <tbody>
+        <tr><td data-editable data-required data-field="receipt-no">RCP-0000-SAMPLE</td><td data-editable data-required data-field="payment-date">DD/MM/YY at 00:00 AM</td><td class="amount-cell" data-editable data-required data-field="bill-amount">0.00 BIRR</td></tr>
+        <tr><td colspan="2" style="text-align: right; padding-right: 15.1px;" data-editable data-field="l-service-fee">የአገልግሎት ክፍያ / SERVICE FEE</td><td class="amount-cell" data-editable data-required data-field="service-fee">0.00 BIRR</td></tr>
+        <tr class="total-row"><td colspan="2" style="text-align: right; padding-right: 15.1px;" data-editable data-field="l-total">ጠቅላላ / TOTAL AMOUNT</td><td class="amount-cell" data-editable data-required data-field="total-amount">0.00 BIRR</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="additional-info">
+    <div class="info-group"><span class="label" data-editable data-field="l-amount-words"><span class="amharic">ጠቅላላ መጠን በቃላት /</span> TOTAL AMOUNT IN WORD</span><span class="value" data-editable data-required data-field="amount-words">Amount In Words Only</span></div>
+    <div class="info-group"><span class="label" data-editable data-field="l-debit-account"><span class="amharic">የተቀናሽ ሂሳብ /</span> DEBIT ACCOUNT</span><span class="value" data-editable data-field="debit-account">N/A</span></div>
+    <div class="info-group"><span class="label" data-editable data-field="l-transaction-type"><span class="amharic">የግብይት ዓይነት /</span> TRANSACTION TYPE</span><span class="value" data-editable data-field="transaction-type">Pay Utility - EEU</span></div>
+    <div class="info-group"><span class="label" data-editable data-field="l-payment-channel"><span class="amharic">የክፍያ መንገድ /</span> PAYMENT CHANNEL</span><span class="value" data-editable data-field="payment-channel">USSD</span></div>
+    <div class="info-group"><span class="label" data-editable data-field="l-payment-reason"><span class="amharic">የክፍያ ምክንያት /</span> PAYMENT REASON</span><span class="value" data-editable data-field="payment-reason">Electricity Bill Payment</span></div>
+  </div>
+
+  <div class="stamp-watermark"><img src="assets/M-PESA-official_stamp.png" alt="M-PESA Stamp"></div>
+  <!-- fixed thank-you line: deliberately NOT editable -->
+  <div class="footer">M-PESAን ስለተጠቀሙ እናመሰግናለን / THANK YOU FOR USING M-PESA</div>
+  <!-- a real white wordmark, not a CSS invert filter: html2canvas ignores filters -->
+  <div class="footer-bar"><img src="assets/M-PESA-wordmark-white.svg" alt="M-PESA" width="145.5" height="39.69"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="assets/assets-inline.js"></script>
+<script src="vendor/html2pdf.bundle.min.js"></script>
+<script src="template.js"></script>
+</body>
+</html>
