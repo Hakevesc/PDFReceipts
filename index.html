@@ -333,6 +333,7 @@
     { name: 'Receive Payment', file: 'Receive Payment Business.html', group: 'business' },
     { name: 'Merchant to Bank', file: 'Merchant to Bank PDF.html', group: 'business' },
     { name: 'Merchant to Merchant Transfer', file: 'Merchant to Merchant Transfer Receipt PDF.html', group: 'business' },
+    { name: 'Rollup / Collect Balance', file: 'Rollup Collect Balance PDF.html', group: 'business' },
   ];
 
   function renderList(id, items, missing = []) {
@@ -379,6 +380,7 @@
   const businessOnly = new Set([
     'Merchant to Bank',
     'Merchant to Merchant Transfer',
+    'Rollup / Collect Balance',
   ]);
 
   // Every other Business receipt with no Customer counterpart, listed as a disabled row
