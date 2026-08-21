@@ -197,6 +197,41 @@
     stroke: var(--Primary);
   }
 
+  /* Not built yet — shown in Customer for each Business receipt with no counterpart */
+  .receipt-item.missing {
+    background: #F7F7F8;
+    border: 1px dashed var(--Border);
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+
+  .receipt-item.missing:hover {
+    border-color: var(--Border);
+    box-shadow: none;
+    transform: none;
+  }
+
+  .receipt-item.missing:active { transform: none; }
+
+  .receipt-item.missing .receipt-icon { background: #EFEFF1; }
+  .receipt-item.missing .receipt-icon svg { stroke: var(--On-Surface-Low); }
+  .receipt-item.missing .receipt-name { color: var(--On-Surface-Low); }
+
+  .missing-badge {
+    font-family: 'Switzer', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--On-Surface-Low);
+    background: #E4E4E8;
+    border-radius: 4px;
+    padding: 3px 7px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
   /* Footer */
   .footer-note {
     text-align: center;
@@ -300,10 +335,11 @@
     { name: 'Merchant to Merchant Transfer', file: 'Merchant to Merchant Transfer Receipt PDF.html', group: 'business' },
   ];
 
-  function renderList(id, items) {
+  function renderList(id, items, missing = []) {
     const el = document.getElementById(id);
     if (!el) return;
-    el.innerHTML = items.map(r => `
+
+    const built = items.map(r => `
       <a class="receipt-item" href="${r.file}">
         <div class="receipt-icon">${pdfIcon}</div>
         <div class="receipt-info">
@@ -312,13 +348,38 @@
         </div>
         ${arrowSvg}
       </a>
-    `).join('');
+    `);
+
+    const todo = missing.map(r => `
+      <div class="receipt-item missing" aria-disabled="true"
+           title="No customer version of &quot;${r.name}&quot; exists yet">
+        <div class="receipt-icon">${pdfIcon}</div>
+        <div class="receipt-info">
+          <div class="receipt-name">${r.name}</div>
+          <div class="receipt-file">not created yet</div>
+        </div>
+        <span class="missing-badge">Missing</span>
+      </div>
+    `);
+
+    el.innerHTML = built.concat(todo).join('');
     const countEl = el.parentElement.querySelector('.cat-count');
-    if (countEl) countEl.textContent = `(${items.length})`;
+    if (countEl) {
+      countEl.textContent = missing.length
+        ? `(${items.length} · ${missing.length} missing)`
+        : `(${items.length})`;
+    }
   }
 
-  renderList('customerList', receipts.filter(r => r.group === 'customer'));
-  renderList('businessList', receipts.filter(r => r.group === 'business'));
+  const customer = receipts.filter(r => r.group === 'customer');
+  const business = receipts.filter(r => r.group === 'business');
+
+  // Every Business receipt with no Customer counterpart, listed as a disabled row
+  const customerNames = new Set(customer.map(r => r.name));
+  const missingCustomer = business.filter(r => !customerNames.has(r.name));
+
+  renderList('customerList', customer, missingCustomer);
+  renderList('businessList', business);
 
   document.getElementById('totalCount').textContent = receipts.length + ' receipts';
 </script>
