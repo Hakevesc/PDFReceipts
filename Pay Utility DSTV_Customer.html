@@ -44,6 +44,20 @@
  .info-group .label .amharic { font-weight: 400; color: #555; }
 .info-group .value { flex: 1; color: #1C1C21; font-weight: 600; }
  .amount-words { font-style: italic; color: #1C1C21; font-weight: 600; }
+ .stamp-target { position: relative; }
+ .stamp-ring {
+   position: absolute;
+   top: 8px;
+   left: -18px;
+   width: calc(100% + 36px);
+   height: calc(100% - 16px);
+   border: 2.5px double #C41E3A;
+   border-radius: 999px;
+   transform: rotate(-3deg);
+   mix-blend-mode: multiply;
+   opacity: 0.9;
+   pointer-events: none;
+ }
  .stamp-watermark { position: absolute; top: 597.2px; right: 68px; width: 249.4px; height: 249.4px; opacity: 0.95; pointer-events: none; z-index: 101; transform: rotate(-12deg); }
  .stamp-watermark img { width: 100%; height: 100%; object-fit: contain; }
  .footer { text-align: center; padding: 15.1px 0 11.3px; border-top: 1px solid #E0E0E0; font-size: 11.3px; color: #1C1C21; font-weight: 500; letter-spacing: 0.5px; margin-top: auto; }
@@ -102,8 +116,11 @@
     </table>
   </div>
   <div class="additional-info">
-    <div class="info-group"><span class="label"><span class="amharic">ጠቅላላ መጠን በቃላት /</span> TOTAL AMOUNT IN WORD</span><span class="value">Two Thousand Twenty-Three Birr and Sixty Cents Only</span></div>
-    <div class="info-group"><span class="label"><span class="amharic">የተቀናሽ ሂሳብ /</span> DEBIT ACCOUNT</span><span class="value">Betty Merhat Agency - 876543</span></div>
+    <div class="stamp-target">
+      <div class="info-group"><span class="label"><span class="amharic">ጠቅላላ መጠን በቃላት /</span> TOTAL AMOUNT IN WORD</span><span class="value">Two Thousand Twenty-Three Birr and Sixty Cents Only</span></div>
+      <div class="info-group"><span class="label"><span class="amharic">የተቀናሽ ሂሳብ /</span> DEBIT ACCOUNT</span><span class="value">Betty Merhat Agency - 876543</span></div>
+      <div class="stamp-ring"></div>
+    </div>
     <div class="info-group"><span class="label"><span class="amharic">የግብይት ዓይነት /</span> TRANSACTION TYPE</span><span class="value">Pay Utility - DSTV</span></div>
     <div class="info-group"><span class="label"><span class="amharic">የክፍያ መንገድ /</span> PAYMENT CHANNEL</span><span class="value">M-PESA App</span></div>
     <div class="info-group"><span class="label"><span class="amharic">የክፍያ ምክንያት /</span> PAYMENT REASON</span><span class="value">DSTV Subscription - Compact Plus</span></div>
