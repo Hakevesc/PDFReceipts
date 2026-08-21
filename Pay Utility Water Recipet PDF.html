@@ -250,15 +250,15 @@
  /* ===== STAMP ===== */
  .stamp-watermark {
  position: absolute;
- top: 642.5px;
- right: 68px;
- width: 226.8px;
- height: 226.8px;
+ top: 50%;
+ right: 15.1px;
+ width: 181.4px;
+ height: 181.4px;
  opacity: 0.95;
  
  pointer-events: none;
  z-index: 101;
- transform: rotate(-12deg);
+ transform: translateY(-50%) rotate(-12deg);
  }
 
  .stamp-watermark img {
@@ -443,6 +443,7 @@
 
   <!-- Additional Information -->
   <div class="additional-info">
+    <div class="stamp-target" style="position: relative;">
     <div class="info-group">
       <span class="label"><span class="amharic">ጠቅላላ መጠን በቃላት /</span> TOTAL AMOUNT IN WORD</span>
       <span class="value amount-words">Two Hundred Eighty-One Birr and Eighty Cents Only</span>
@@ -451,6 +452,10 @@
       <span class="label"><span class="amharic">የክፍያ መንገድ /</span> PAYMENT CHANNEL</span>
       <span class="value">M-PESA App</span>
     </div>
+    <div class="stamp-watermark">
+    <img src="assets/M-PESA-official_stamp.png" alt="M-PESA Stamp">
+  </div>
+  </div>
     <div class="info-group">
       <span class="label"><span class="amharic">የክፍያ ምክንያት /</span> PAYMENT REASON</span>
       <span class="value">Water Bill Payment</span>
@@ -458,9 +463,7 @@
   </div>
 
   <!-- Stamp -->
-  <div class="stamp-watermark">
-    <img src="assets/M-PESA-official_stamp.png" alt="M-PESA Stamp">
-  </div>
+
 
   <!-- Footer -->
   <div class="footer">

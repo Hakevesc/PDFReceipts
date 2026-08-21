@@ -204,10 +204,11 @@
  }
 
  /* ===== STAMP ===== */
+ .amount-section { position: relative; }
  .stamp-watermark {
  position: absolute;
- top: 566.9px; right: 68px;
- width: 245.7px; height: 245.7px;
+ bottom: -9.7px; right: 15.1px;
+ width: 196.6px; height: 196.6px;
  opacity: 0.92;
  
  pointer-events: none;
@@ -249,11 +250,6 @@
 
   <!-- Diagonal Watermark -->
   <div class="mpesa-watermark-text">M-PESA</div>
-
-  <!-- Official Stamp -->
-  <div class="stamp-watermark">
-    <img src="assets/M-PESA-official_stamp.png" alt="M-PESA Official Stamp">
-  </div>
 
   <!-- ===== HEADER ===== -->
   <div class="header">
@@ -341,7 +337,7 @@
   </div>
 
   <!-- ===== SECTION 3: AMOUNT BREAKDOWN ===== -->
-  <div class="receipt-section">
+  <div class="receipt-section amount-section">
     <div class="section-title"><h2>Amount Breakdown</h2></div>
 
     <table class="amount-table">
@@ -366,6 +362,11 @@
         <td class="words-val">Two Thousand Forty-One &amp; 30/100 Ethiopian Birr Only</td>
       </tr>
     </table>
+
+    <!-- Official Stamp -->
+    <div class="stamp-watermark">
+      <img src="assets/M-PESA-official_stamp.png" alt="M-PESA Official Stamp">
+    </div>
   </div>
 
   <!-- ===== FOOTER TEXT ===== -->
