@@ -374,9 +374,18 @@
   const customer = receipts.filter(r => r.group === 'customer');
   const business = receipts.filter(r => r.group === 'business');
 
-  // Every Business receipt with no Customer counterpart, listed as a disabled row
+  // Merchant-side only — these have no customer equivalent by design,
+  // so they are not counted as gaps in the Customer list.
+  const businessOnly = new Set([
+    'Merchant to Bank',
+    'Merchant to Merchant Transfer',
+  ]);
+
+  // Every other Business receipt with no Customer counterpart, listed as a disabled row
   const customerNames = new Set(customer.map(r => r.name));
-  const missingCustomer = business.filter(r => !customerNames.has(r.name));
+  const missingCustomer = business.filter(
+    r => !customerNames.has(r.name) && !businessOnly.has(r.name)
+  );
 
   renderList('customerList', customer, missingCustomer);
   renderList('businessList', business);
