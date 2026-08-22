@@ -197,8 +197,9 @@
     stroke: var(--Primary);
   }
 
-  /* Not built yet — shown in Customer for each Business receipt with no counterpart */
-  .receipt-item.missing {
+  /* Not applicable — shown in Customer for each Business receipt with no counterpart */
+  .receipt-item.missing,
+  .receipt-item.disabled {
     background: #F7F7F8;
     border: 1px dashed var(--Border);
     box-shadow: none;
@@ -206,19 +207,25 @@
     opacity: 0.65;
   }
 
-  .receipt-item.missing:hover {
+  .receipt-item.missing:hover,
+  .receipt-item.disabled:hover {
     border-color: var(--Border);
     box-shadow: none;
     transform: none;
   }
 
-  .receipt-item.missing:active { transform: none; }
+  .receipt-item.missing:active,
+  .receipt-item.disabled:active { transform: none; }
 
-  .receipt-item.missing .receipt-icon { background: #EFEFF1; }
-  .receipt-item.missing .receipt-icon svg { stroke: var(--On-Surface-Low); }
-  .receipt-item.missing .receipt-name { color: var(--On-Surface-Low); }
+  .receipt-item.missing .receipt-icon,
+  .receipt-item.disabled .receipt-icon { background: #EFEFF1; }
+  .receipt-item.missing .receipt-icon svg,
+  .receipt-item.disabled .receipt-icon svg { stroke: var(--On-Surface-Low); }
+  .receipt-item.missing .receipt-name,
+  .receipt-item.disabled .receipt-name { color: var(--On-Surface-Low); }
 
-  .missing-badge {
+  .missing-badge,
+  .disabled-badge {
     font-family: 'Switzer', sans-serif;
     font-size: 10px;
     font-weight: 600;
@@ -307,7 +314,9 @@
     { name: 'Agency Banking Cashout', file: 'Agency Banking Cashout Recipet PDF.html', group: 'customer' },
     { name: 'Cash In', file: 'Cashin M-PESA_Customer.html', group: 'customer' },
     { name: 'Cashout', file: 'Cashout M-PESA_Customer.html', group: 'customer' },
+    { name: 'Pay Utility DSTV', file: 'Pay Utility DSTV_Customer.html', group: 'customer', disabled: true },
     { name: 'Pay Utility EEU', file: 'Pay Utility EEU_Customer.html', group: 'customer' },
+    { name: 'Pay Utility ET', file: 'Pay Utility ET_Customer.html', group: 'customer', disabled: true },
     { name: 'Pay Utility School', file: 'Pay Utility School_Customer.html', group: 'customer' },
     { name: 'Pay Utility Water', file: 'Pay Utility Water_Customer.html', group: 'customer' },
 
@@ -316,7 +325,9 @@
     { name: 'Agency Banking Cashout', file: 'Agency Banking Cashout_Business.html', group: 'business' },
     { name: 'Cash In', file: 'Cashin Recipet PDF.html', group: 'business' },
     { name: 'Cashout', file: 'Cashout Recipet PDF.html', group: 'business' },
+    { name: 'Pay Utility DSTV', file: 'Pay Utility DSTV Recipet PDF.html', group: 'business', disabled: true },
     { name: 'Pay Utility EEU', file: 'Pay Utility EEU Recipet PDF.html', group: 'business' },
+    { name: 'Pay Utility ET', file: 'Pay Utility Recipet PDF.html', group: 'business', disabled: true },
     { name: 'Pay Utility School', file: 'Pay Utility School Recipet PDF.html', group: 'business' },
     { name: 'Pay Utility Water', file: 'Pay Utility Water Recipet PDF.html', group: 'business' },
     { name: 'Sell Airtime', file: 'Sell Airtime Recipet PDF.html', group: 'business' },
@@ -336,7 +347,17 @@
     const el = document.getElementById(id);
     if (!el) return;
 
-    const built = items.map(r => `
+    const built = items.map(r => r.disabled ? `
+      <div class="receipt-item disabled" aria-disabled="true"
+           title="&quot;${r.name}&quot; is turned off for now">
+        <div class="receipt-icon">${pdfIcon}</div>
+        <div class="receipt-info">
+          <div class="receipt-name">${r.name}</div>
+          <div class="receipt-file">${r.file}</div>
+        </div>
+        <span class="disabled-badge">Disabled</span>
+      </div>
+    ` : `
       <a class="receipt-item" href="${r.file}">
         <div class="receipt-icon">${pdfIcon}</div>
         <div class="receipt-info">
@@ -349,22 +370,25 @@
 
     const todo = missing.map(r => `
       <div class="receipt-item missing" aria-disabled="true"
-           title="No customer version of &quot;${r.name}&quot; exists yet">
+           title="&quot;${r.name}&quot; does not apply to customer receipts">
         <div class="receipt-icon">${pdfIcon}</div>
         <div class="receipt-info">
           <div class="receipt-name">${r.name}</div>
-          <div class="receipt-file">not created yet</div>
+          <div class="receipt-file">not applicable</div>
         </div>
-        <span class="missing-badge">Missing</span>
+        <span class="missing-badge">Not Applicable</span>
       </div>
     `);
 
     el.innerHTML = built.concat(todo).join('');
     const countEl = el.parentElement.querySelector('.cat-count');
     if (countEl) {
-      countEl.textContent = missing.length
-        ? `(${items.length} · ${missing.length} missing)`
-        : `(${items.length})`;
+      const live = items.filter(r => !r.disabled).length;
+      const off = items.length - live;
+      const notes = [];
+      if (off) notes.push(`${off} disabled`);
+      if (missing.length) notes.push(`${missing.length} not applicable`);
+      countEl.textContent = notes.length ? `(${live} · ${notes.join(' · ')})` : `(${live})`;
     }
   }
 
@@ -389,7 +413,7 @@
   renderList('customerList', customer, missingCustomer);
   renderList('businessList', business);
 
-  document.getElementById('totalCount').textContent = receipts.length + ' receipts';
+  document.getElementById('totalCount').textContent = receipts.filter(r => !r.disabled).length + ' receipts';
 </script>
 </body>
 </html>

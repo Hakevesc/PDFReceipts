@@ -25,7 +25,7 @@
  .title-box h1 { font-family: 'Poppins', sans-serif; font-size: 11.2px; font-weight: 700; color: #FE353D; letter-spacing: 1.5px; text-transform: uppercase; }
  .transaction-info { margin-bottom: 22.7px; }
  .info-row { display: flex; padding: 5.7px 0; gap: 61.2px; font-size: 12px; }
- .info-label { min-width: 272.1px; color: #1C1C21; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
+ .info-label { width: 272.1px; flex-shrink: 0; color: #1C1C21; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
  .info-label .amharic { font-weight: 400; color: #555; }
 .info-value { flex: 1; color: #1C1C21; font-weight: 600; }
  .detail-section { margin-bottom: 22.7px; }
@@ -95,7 +95,6 @@
       <tbody>
         <tr><td>RCP-2024-CUST34567</td><td>12-12-2024 17:00:00</td><td class="amount-cell">2,000.00 BIRR</td></tr>
         <tr><td colspan="2" style="text-align: right; padding-right: 15.1px;">የአገልግሎት ክፍያ / SERVICE FEE</td><td class="amount-cell">0.00 BIRR</td></tr>
-        <tr><td colspan="2" style="text-align: right; padding-right: 15.1px;">የኮሚሽን ክፍያ / COMMISSION FEE</td><td class="amount-cell">0.00 BIRR</td></tr>
         <tr><td colspan="2" style="text-align: right; padding-right: 15.1px;">15% VAT</td><td class="amount-cell">0.00 BIRR</td></tr>
         <tr class="total-row"><td colspan="2" style="text-align: right; padding-right: 15.1px;">ጠቅላላ / TOTAL</td><td class="amount-cell">2,000.00 BIRR</td></tr>
       </tbody>
@@ -104,11 +103,9 @@
   <div class="additional-info">
     <div class="stamp-target" style="position: relative;">
     <div class="info-group"><span class="label"><span class="amharic">ጠቅላላ መጠን በቃላት /</span> TOTAL AMOUNT IN WORD</span><span class="value">Two Thousand Birr Only</span></div>
-    <div class="info-group"><span class="label"><span class="amharic">የተቀናሽ ሂሳብ /</span> DEBIT ACCOUNT</span><span class="value">Betty Merhat Agency - 876543</span></div>
     <div class="stamp-watermark"><img src="assets/M-PESA-official_stamp.png" alt="M-PESA Stamp"></div>
   </div>
     <div class="info-group"><span class="label"><span class="amharic">የግብይት ዓይነት /</span> TRANSACTION TYPE</span><span class="value">Pay Utility - School</span></div>
-    <div class="info-group"><span class="label"><span class="amharic">የክፍያ መንገድ /</span> PAYMENT CHANNEL</span><span class="value">M-PESA App</span></div>
     <div class="info-group"><span class="label"><span class="amharic">የክፍያ ምክንያት /</span> PAYMENT REASON</span><span class="value">School Fee Payment</span></div>
   </div>
 
