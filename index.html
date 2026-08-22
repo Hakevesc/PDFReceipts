@@ -416,6 +416,13 @@
     flex-shrink: 0;
   }
 
+  /* Not Applicable reads as a deliberate state, so it carries the brand
+     red rather than the silver used for merely-inactive things. */
+  .missing-badge {
+    color: var(--Primary-Dark);
+    background: #FFE1E3;
+  }
+
   /* Footer */
   .footer-note {
     text-align: center;
@@ -510,8 +517,8 @@
 
   const receipts = [
     // ===== Customer =====
-    { name: 'Agency Banking Cash In', file: 'Agency Banking Cashin Recipet PDF.html', group: 'customer' },
-    { name: 'Agency Banking Cashout', file: 'Agency Banking Cashout Recipet PDF.html', group: 'customer' },
+    { name: 'Agency Banking Cash In', file: 'Agency Banking Cashin_Customer.html', group: 'customer' },
+    { name: 'Agency Banking Cashout', file: 'Agency Banking Cashout_Customer.html', group: 'customer' },
     { name: 'Cash In', file: 'Cashin M-PESA_Customer.html', group: 'customer' },
     { name: 'Cashout', file: 'Cashout M-PESA_Customer.html', group: 'customer' },
     { name: 'Pay Utility DSTV', file: 'Pay Utility DSTV_Customer.html', group: 'customer', disabled: true },
@@ -523,24 +530,24 @@
     // ===== Business =====
     { name: 'Agency Banking Cash In', file: 'Agency Banking Cashin_Business.html', group: 'business' },
     { name: 'Agency Banking Cashout', file: 'Agency Banking Cashout_Business.html', group: 'business' },
-    { name: 'Cash In', file: 'Cashin Recipet PDF.html', group: 'business' },
-    { name: 'Cashout', file: 'Cashout Recipet PDF.html', group: 'business' },
-    { name: 'Pay Utility DSTV', file: 'Pay Utility DSTV Recipet PDF.html', group: 'business', disabled: true },
-    { name: 'Pay Utility EEU', file: 'Pay Utility EEU Recipet PDF.html', group: 'business' },
-    { name: 'Pay Utility ET', file: 'Pay Utility Recipet PDF.html', group: 'business', disabled: true },
-    { name: 'Pay Utility School', file: 'Pay Utility School Recipet PDF.html', group: 'business' },
-    { name: 'Pay Utility Water', file: 'Pay Utility Water Recipet PDF.html', group: 'business' },
-    { name: 'Sell Airtime', file: 'Sell Airtime Recipet PDF.html', group: 'business' },
-    { name: 'Sell Float', file: 'Sell Float Recipet PDF.html', group: 'business' },
-    { name: 'Sell Package', file: 'Sell Package Recipet PDF.html', group: 'business' },
-    { name: 'Distribute Float', file: 'Distribute Float Recipet PDF.html', group: 'business' },
-    { name: 'EVD Print', file: 'EVD Receipt Business.html', group: 'business' },
-    { name: 'Voucher Via SMS', file: 'Voucher Via SMS business.html', group: 'business' },
-    { name: 'Request Payment', file: 'Receive Payment Business.html', group: 'business' },
-    { name: 'Merchant to Bank', file: 'Merchant to Bank PDF.html', group: 'business' },
-    { name: 'Merchant to Merchant Transfer', file: 'Merchant to Merchant Transfer Receipt PDF.html', group: 'business' },
-    { name: 'Rollup / Collect Balance (Single Store)', file: 'Rollup Collect Balance Single Store PDF.html', group: 'business' },
-    { name: 'Rollup / Collect Balance (All Stores)', file: 'Rollup Collect Balance All Stores PDF.html', group: 'business' },
+    { name: 'Cash In', file: 'Cashin_Business.html', group: 'business' },
+    { name: 'Cashout', file: 'Cashout_Business.html', group: 'business' },
+    { name: 'Pay Utility DSTV', file: 'Pay Utility DSTV_Business.html', group: 'business', disabled: true },
+    { name: 'Pay Utility EEU', file: 'Pay Utility EEU_Business.html', group: 'business' },
+    { name: 'Pay Utility ET', file: 'Pay Utility ET_Business.html', group: 'business', disabled: true },
+    { name: 'Pay Utility School', file: 'Pay Utility School_Business.html', group: 'business' },
+    { name: 'Pay Utility Water', file: 'Pay Utility Water_Business.html', group: 'business' },
+    { name: 'Sell Airtime', file: 'Sell Airtime_Business.html', group: 'business' },
+    { name: 'Sell Float', file: 'Sell Float_Business.html', group: 'business' },
+    { name: 'Sell Package', file: 'Sell Package_Business.html', group: 'business' },
+    { name: 'Distribute Float', file: 'Distribute Float_Business.html', group: 'business' },
+    { name: 'EVD Print', file: 'EVD Receipt_Business.html', group: 'business' },
+    { name: 'Voucher Via SMS', file: 'Voucher Via SMS_Business.html', group: 'business' },
+    { name: 'Request Payment', file: 'Receive Payment_Business.html', group: 'business' },
+    { name: 'Merchant to Bank', file: 'Merchant to Bank_Business.html', group: 'business' },
+    { name: 'Merchant to Merchant Transfer', file: 'Merchant to Merchant Transfer_Business.html', group: 'business' },
+    { name: 'Rollup / Collect Balance (Single Store)', file: 'Rollup Collect Balance Single Store_Business.html', group: 'business' },
+    { name: 'Rollup / Collect Balance (All Stores)', file: 'Rollup Collect Balance All Stores_Business.html', group: 'business' },
   ];
 
   function renderList(id, items, missing = []) {

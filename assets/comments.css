@@ -371,7 +371,7 @@ html:not(.rc-has-rail) #rc-rail { transform: translateX(100%); }
    cells carry their own #F5F5F5 fills, and a print-time background reset
    would wipe them out. */
 html.rc-armed .rc-commentable {
-  cursor: crosshair;
+  cursor: url("data:image/svg+xml;utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='28'%20height='28'%20viewBox='0%200%2028%2028'%3E%3Cpath%20d='M6%203.5h16a3.5%203.5%200%200%201%203.5%203.5v10a3.5%203.5%200%200%201-3.5%203.5h-8.2L8%2025.2V20.5H6a3.5%203.5%200%200%201-3.5-3.5V7A3.5%203.5%200%200%201%206%203.5z'%20fill='%23FE353D'%20stroke='%23FFFFFF'%20stroke-width='1.8'/%3E%3Ccircle%20cx='9.5'%20cy='12'%20r='1.6'%20fill='%23FFFFFF'/%3E%3Ccircle%20cx='14'%20cy='12'%20r='1.6'%20fill='%23FFFFFF'/%3E%3Ccircle%20cx='18.5'%20cy='12'%20r='1.6'%20fill='%23FFFFFF'/%3E%3C/svg%3E") 3 3, pointer;
   outline: 1.5px dashed rgba(254, 53, 61, 0.55);
   outline-offset: 1px;
 }
