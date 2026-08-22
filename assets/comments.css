@@ -1,0 +1,445 @@
+/* ==========================================================================
+   Receipt comments — rail, pins and composer.
+
+   Everything here lives OUTSIDE .page and is removed entirely in print, so
+   the A4 artwork is never moved, resized or restyled by this file.
+   ========================================================================== */
+
+:root {
+  --rc-rail-w: 340px;
+  --rc-primary: #FE353D;
+  --rc-primary-dark: #C41520;
+  --rc-ink: #1C1C21;
+  --rc-ink-low: #7C7C87;
+  --rc-border: #E8E8EC;
+  --rc-surface: #FFF;
+  --rc-surface-alt: #F7F7F8;
+  --rc-success: #1FC83B;
+}
+
+/* Make room for the rail without touching any receipt's own body rule.
+   Centred pages re-centre inside the narrowed area; left-aligned pages
+   simply keep their position.
+
+   Only above 1180px, which is the A4 page (793.7px) plus the rail (340px)
+   plus body padding. Any narrower and reserving the space would squeeze the
+   page itself, so the rail overlays instead and can be hidden. */
+@media screen and (min-width: 1180px) {
+  html.rc-has-rail body {
+    padding-right: var(--rc-rail-w);
+  }
+}
+
+/* ---------- toggle ---------- */
+
+#rc-toggle {
+  position: fixed;
+  top: 16px;
+  right: calc(var(--rc-rail-w) + 16px);
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid var(--rc-border);
+  border-radius: 999px;
+  background: var(--rc-surface);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.10);
+  font: 600 12px/1 'Inter', Arial, sans-serif;
+  letter-spacing: 0.3px;
+  color: var(--rc-ink);
+  cursor: pointer;
+  transition: right 0.18s ease, background 0.15s ease, color 0.15s ease;
+}
+
+#rc-toggle:hover { background: var(--rc-surface-alt); }
+
+#rc-toggle[data-armed="true"] {
+  background: var(--rc-primary);
+  border-color: var(--rc-primary);
+  color: #FFF;
+}
+
+html:not(.rc-has-rail) #rc-toggle { right: 16px; }
+
+#rc-toggle .rc-toggle-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--rc-primary);
+  color: #FFF;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+#rc-toggle[data-armed="true"] .rc-toggle-count {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+#rc-toggle .rc-toggle-count:empty,
+#rc-toggle .rc-toggle-count[data-n="0"] { display: none; }
+
+/* ---------- rail ---------- */
+
+#rc-rail {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--rc-rail-w);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  background: var(--rc-surface);
+  border-left: 1px solid var(--rc-border);
+  font-family: 'Inter', Arial, sans-serif;
+  color: var(--rc-ink);
+  transform: translateX(0);
+  transition: transform 0.18s ease;
+}
+
+html:not(.rc-has-rail) #rc-rail { transform: translateX(100%); }
+
+.rc-rail-head {
+  flex: none;
+  padding: 18px 18px 12px;
+  border-bottom: 1px solid var(--rc-border);
+}
+
+.rc-rail-title {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.rc-rail-sub {
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--rc-ink-low);
+  word-break: break-word;
+}
+
+.rc-rail-hint {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--rc-surface-alt);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--rc-ink-low);
+}
+
+.rc-rail-hint b { color: var(--rc-ink); font-weight: 600; }
+
+.rc-rail-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px 24px;
+}
+
+.rc-empty {
+  padding: 26px 12px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--rc-ink-low);
+}
+
+.rc-status {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.rc-status.rc-error {
+  background: #FFF1F2;
+  color: var(--rc-primary-dark);
+}
+
+.rc-group-label {
+  margin: 16px 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--rc-ink-low);
+}
+
+/* ---------- threads ---------- */
+
+.rc-thread {
+  margin-bottom: 10px;
+  border: 1px solid var(--rc-border);
+  border-radius: 8px;
+  background: var(--rc-surface);
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rc-thread:hover { border-color: #D5D5DC; }
+
+.rc-thread.rc-active {
+  border-color: var(--rc-primary);
+  box-shadow: 0 0 0 3px rgba(254, 53, 61, 0.12);
+}
+
+.rc-thread.rc-resolved { opacity: 0.62; }
+
+.rc-thread-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  background: var(--rc-surface-alt);
+}
+
+.rc-thread-num {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--rc-primary);
+  color: #FFF;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+}
+
+.rc-thread.rc-resolved .rc-thread-num { background: var(--rc-success); }
+
+.rc-thread-anchor {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.rc-thread-orphan {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: 500;
+  color: #B26B00;
+}
+
+.rc-comment {
+  padding: 10px 12px;
+  border-top: 1px solid var(--rc-border);
+}
+
+.rc-comment.rc-reply {
+  padding-left: 24px;
+  background: #FCFCFD;
+}
+
+.rc-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.rc-author { font-size: 11px; font-weight: 600; }
+.rc-time { font-size: 10px; color: var(--rc-ink-low); }
+
+.rc-body {
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.rc-thread-foot {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--rc-border);
+}
+
+.rc-link {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: 600 11px/1 'Inter', Arial, sans-serif;
+  color: var(--rc-ink-low);
+  cursor: pointer;
+}
+
+.rc-link:hover { color: var(--rc-primary); }
+.rc-link.rc-done:hover { color: var(--rc-success); }
+
+/* ---------- composer ---------- */
+
+.rc-composer { padding: 10px 12px; border-top: 1px solid var(--rc-border); }
+
+.rc-composer textarea {
+  width: 100%;
+  min-height: 62px;
+  padding: 8px 9px;
+  border: 1px solid var(--rc-border);
+  border-radius: 6px;
+  font: 400 12px/1.5 'Inter', Arial, sans-serif;
+  color: var(--rc-ink);
+  resize: vertical;
+}
+
+.rc-composer textarea:focus {
+  outline: none;
+  border-color: var(--rc-primary);
+  box-shadow: 0 0 0 3px rgba(254, 53, 61, 0.10);
+}
+
+.rc-composer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.rc-composer-who { font-size: 10px; color: var(--rc-ink-low); }
+
+.rc-btn {
+  padding: 7px 13px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--rc-primary);
+  color: #FFF;
+  font: 600 11px/1 'Inter', Arial, sans-serif;
+  cursor: pointer;
+}
+
+.rc-btn:hover { background: var(--rc-primary-dark); }
+.rc-btn[disabled] { opacity: 0.5; cursor: default; }
+
+.rc-btn-ghost {
+  background: none;
+  color: var(--rc-ink-low);
+  border: 1px solid var(--rc-border);
+}
+
+.rc-btn-ghost:hover { background: var(--rc-surface-alt); color: var(--rc-ink); }
+
+/* ---------- pins and hover targets ---------- */
+
+/* The pin layer sits inside .page (which is position:relative in every
+   receipt) but paints nothing of its own and never accepts layout space. */
+.rc-pin-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+}
+
+.rc-pin {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border: 2px solid #FFF;
+  border-radius: 50% 50% 50% 2px;
+  background: var(--rc-primary);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28);
+  color: #FFF;
+  font: 700 11px/19px 'Inter', Arial, sans-serif;
+  text-align: center;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.12s ease;
+}
+
+.rc-pin:hover, .rc-pin.rc-active { transform: scale(1.2); }
+.rc-pin.rc-resolved { background: var(--rc-success); }
+.rc-pin.rc-orphan { background: #B26B00; }
+
+/* Hover affordance while comment mode is armed.
+   Deliberately outline-only: outline paints outside the box so it cannot
+   shift layout, and no receipt uses the outline property, so the print
+   reset below can clear it without touching anything the artwork owns.
+   Background tinting is avoided on purpose — .section-header and table
+   cells carry their own #F5F5F5 fills, and a print-time background reset
+   would wipe them out. */
+html.rc-armed .rc-commentable {
+  cursor: crosshair;
+  outline: 1.5px dashed rgba(254, 53, 61, 0.55);
+  outline-offset: 1px;
+}
+
+html.rc-armed .rc-commentable:hover {
+  outline: 2px solid var(--rc-primary);
+  outline-offset: 2px;
+}
+
+.rc-flash {
+  animation: rc-flash 1.1s ease;
+}
+
+@keyframes rc-flash {
+  0%, 100% { outline-color: transparent; }
+  25%, 75% { outline: 2px solid var(--rc-primary); outline-offset: 1px; }
+}
+
+/* ---------- narrow screens: rail becomes a bottom sheet ---------- */
+
+@media screen and (max-width: 800px) {
+  html.rc-has-rail body { padding-right: 0; }
+
+  #rc-rail {
+    top: auto;
+    left: 0;
+    width: auto;
+    height: 55vh;
+    border-left: 0;
+    border-top: 1px solid var(--rc-border);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.12);
+  }
+
+  html:not(.rc-has-rail) #rc-rail { transform: translateY(100%); }
+
+  #rc-toggle, html:not(.rc-has-rail) #rc-toggle {
+    top: auto;
+    right: 14px;
+    bottom: 14px;
+  }
+
+  html.rc-has-rail #rc-toggle { bottom: calc(55vh + 14px); }
+}
+
+/* ---------- print: nothing from this feature may survive ---------- */
+
+@media print {
+  #rc-rail,
+  #rc-toggle,
+  .rc-pin-layer,
+  .rc-pin {
+    display: none !important;
+  }
+
+  html.rc-has-rail body,
+  html.rc-has-rail.rc-armed body {
+    padding-right: 0 !important;
+  }
+
+  /* Clear only the properties this feature sets. background is never
+     touched here — the receipts own theirs. */
+  html.rc-armed .rc-commentable,
+  html.rc-armed .rc-commentable:hover,
+  .rc-commentable,
+  .rc-flash {
+    outline: none !important;
+    outline-offset: 0 !important;
+    cursor: auto !important;
+    animation: none !important;
+  }
+}
