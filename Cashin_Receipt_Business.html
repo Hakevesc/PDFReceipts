@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M-PESA Pay Utility Water Receipt</title>
+<title>M-PESA Cash In Receipt</title>
 <style>
  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
@@ -26,8 +26,8 @@
  display: flex;
  justify-content: space-between;
  align-items: flex-end;
- margin-bottom: 11.3px;
- padding-bottom: 11.3px;
+ margin-bottom: 15.1px;
+ padding-bottom: 15.1px;
  border-bottom: 1px solid #E0E0E0;
  }
 
@@ -36,9 +36,9 @@
  }
 
  .mpesa-logo {
- height: 52.9px;
+ height: 56.7px;
  width: auto;
- margin-bottom: 9.4px;
+ margin-bottom: 11.3px;
  }
 
  .company-name {
@@ -46,13 +46,13 @@
  font-size: 14.7px;
  font-weight: 700;
  color: #1C1C21;
- margin-bottom: 5.7px;
+ margin-bottom: 7.6px;
  }
 
  .company-details {
- font-size: 12.7px;
+ font-size: 13.3px;
  color: #1C1C21;
- line-height: 2.0;
+ line-height: 2.4;
  font-weight: 400;
  }
 
@@ -72,8 +72,8 @@
  }
 
  .qr-code {
- width: 90.7px;
- height: 90.7px;
+ width: 94.5px;
+ height: 94.5px;
  background: #FFF;
  border: 1px solid #E0E0E0;
  display: flex;
@@ -98,9 +98,9 @@
  /* ===== TITLE BOX ===== */
  .title-box {
  border: 2px solid #FE353D;
- padding: 7.6px 0;
+ padding: 9.4px 0;
  text-align: center;
- margin: 11.3px 0 15.1px;
+ margin: 15.1px 0 22.7px;
  }
 
  .title-box h1 {
@@ -114,18 +114,18 @@
 
  /* ===== TRANSACTION INFO ===== */
  .transaction-info {
- margin-bottom: 15.1px;
+ margin-bottom: 22.7px;
  }
 
  .info-row {
  display: flex;
- padding: 3.4px 0;
+ padding: 5.7px 0;
  gap: 61.2px;
- font-size: 11.6px;
+ font-size: 12px;
  }
 
  .info-label {
- width: 264.6px; flex-shrink: 0;
+ width: 272.1px; flex-shrink: 0;
  color: #1C1C21;
  font-weight: 500;
  text-transform: uppercase;
@@ -145,12 +145,12 @@
 
  /* ===== TRANSACTION DETAIL TABLE ===== */
  .detail-section {
- margin-bottom: 15.1px;
+ margin-bottom: 22.7px;
  }
 
  .section-header {
  background: #F5F5F5;
- padding: 6.8px 11.3px;
+ padding: 7.6px 11.3px;
  text-align: center;
  margin-bottom: 7.6px;
  }
@@ -172,7 +172,7 @@
 
  .detail-table th {
  background: #F5F5F5;
- padding: 6.8px 7.6px;
+ padding: 7.6px 7.6px;
  text-align: left;
  font-weight: 600;
  color: #1C1C21;
@@ -184,7 +184,7 @@
  }
 
  .detail-table td {
- padding: 6.8px 7.6px;
+ padding: 7.6px 7.6px;
  border: 1px solid #E0E0E0;
  vertical-align: middle;
  }
@@ -208,20 +208,20 @@
 
  /* ===== ADDITIONAL INFO ===== */
  .additional-info {
- margin-bottom: 15.1px;
- padding-top: 11.3px;
+ margin-bottom: 22.7px;
+ padding-top: 15.1px;
  border-top: 1px solid #E0E0E0;
  }
 
  .info-group {
  display: flex;
- padding: 3.4px 0;
+ padding: 5.7px 0;
  gap: 61.2px;
- font-size: 11.6px;
+ font-size: 12px;
  }
 
  .info-group .label {
- width: 264.6px; flex-shrink: 0;
+ width: 272.1px; flex-shrink: 0;
  color: #1C1C21;
  font-weight: 500;
  text-transform: uppercase;
@@ -250,15 +250,14 @@
  .stamp-watermark {
  position: absolute;
  top: 50%;
- right: 15.1px;
- width: 181.4px;
- height: 181.4px;
+ right: 25.1px;
+ width: 179.6px;
+ height: 179.6px;
  opacity: 0.95;
  
  pointer-events: none;
  z-index: 101;
- transform: translateY(-50%) rotate(-12deg);
- }
+ transform: translateY(-50%) rotate(-12deg); mix-blend-mode: multiply;}
 
  .stamp-watermark img {
  width: 100%;
@@ -340,68 +339,32 @@
   <!-- Transaction Information -->
   <div class="transaction-info">
     <div class="info-row">
-      <span class="info-label"><span class="amharic">የከፋዩ ስም /</span> PAYER NAME</span>
+      <span class="info-label"><span class="amharic">የላኪው ስም /</span> SENDER NAME</span>
       <span class="info-value">Betty Merhat Agency</span>
     </div>
     <div class="info-row">
-      <span class="info-label"><span class="amharic">የከፋዩ አጭር ኮድ /</span> PAYER SHORT CODE</span>
+      <span class="info-label"><span class="amharic">የላኪው አጭር ኮድ /</span> SENDER SHORT CODE</span>
       <span class="info-value">876543</span>
     </div>
     <div class="info-row">
-      <span class="info-label"><span class="amharic">የደንበኛ ስም /</span> CUSTOMER NAME</span>
-      <span class="info-value">Kidist Alemayehu Tadesse</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label"><span class="amharic">የደንበኛ ቅርንጫፍ /</span> CUSTOMER BRANCH</span>
-      <span class="info-value">Bole Branch</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label"><span class="amharic">የከፋዩ TIN ቁጥር /</span> PAYER TIN NO</span>
+      <span class="info-label"><span class="amharic">የላኪው TIN ቁጥር /</span> SENDER TIN NO</span>
       <span class="info-value">0098765432</span>
     </div>
     <div class="info-row">
-      <span class="info-label"><span class="amharic">የተቀባይ ድርጅት ስም /</span> RECEIVER BUSINESS NAME</span>
-      <span class="info-value">Addis Ababa Water &amp; Sewerage Authority</span>
+      <span class="info-label"><span class="amharic">የተቀባይ ስም /</span> RECEIVER NAME</span>
+      <span class="info-value">Abebe Kebede Bekele</span>
     </div>
     <div class="info-row">
-      <span class="info-label"><span class="amharic">የድርጅት ከተማ /</span> BILLER ORG CITY</span>
-      <span class="info-value">Addis Ababa</span>
+      <span class="info-label"><span class="amharic">የተቀባይ ስልክ ቁጥር /</span> RECEIVER PHONE NUMBER</span>
+      <span class="info-value">251911223344</span>
     </div>
     <div class="info-row">
-      <span class="info-label"><span class="amharic">የተቀባይ TIN ቁጥር /</span> RECEIVER TIN NUMBER</span>
-      <span class="info-value">TIN-0012345678</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label"><span class="amharic">የተቀባይ VAT ቁጥር /</span> RECEIVER VAT NUMBER</span>
-      <span class="info-value">VAT-9876543210</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label"><span class="amharic">የደንበኛ ቁልፍ /</span> CUSTOMER KEY</span>
-      <span class="info-value">CUST-KEY-1234567</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label"><span class="amharic">ቀዳሚ ንባብ /</span> PREVIOUS READING</span>
-      <span class="info-value">1,250 m³</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label"><span class="amharic">የአሁኑ ንባብ /</span> CURRENT READING</span>
-      <span class="info-value">1,320 m³</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label"><span class="amharic">የክፍያ ወር /</span> BILL MONTH</span>
-      <span class="info-value">May-26</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label"><span class="amharic">የዚህ ወር መጠን /</span> THIS MONTH AMOUNT</span>
-      <span class="info-value">70.00 BIRR</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label"><span class="amharic">ያልተከፈለ መጠን /</span> OUTSTANDING AMOUNT</span>
-      <span class="info-value">200.00 BIRR</span>
+      <span class="info-label"><span class="amharic">መጠን /</span> AMOUNT</span>
+      <span class="info-value">2,000.00 BIRR</span>
     </div>
     <div class="info-row">
       <span class="info-label"><span class="amharic">የግብይት መታወቂያ /</span> TRANSACTION ID</span>
-      <span class="info-value">WTR55667788</span>
+      <span class="info-value">DCK87654321</span>
     </div>
   </div>
 
@@ -414,31 +377,23 @@
       <thead>
         <tr>
           <th style="width: 33%;"><span class="amharic">ደረሰኝ ቁጥር /</span> RECEIPT NO</th>
-          <th style="width: 33%;"><span class="amharic">የክፍያ ቀን /</span> PAYMENT DATE</th>
-          <th style="width: 34%;"><span class="amharic">መጠን /</span> AMOUNT</th>
+          <th style="width: 33%;"><span class="amharic">የግብይት ቀንና ሰዓት /</span> TRANSACTION DATE AND TIME</th>
+          <th style="width: 34%;"><span class="amharic">የተቀማጭ መጠን /</span> DEPOSIT AMOUNT</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>RCP-2024-55667788</td>
-          <td>12-12-2024 16:00:00</td>
-          <td class="amount-cell">270.00 BIRR</td>
-        </tr>
-        <tr>
-          <td colspan="2" style="text-align: right; padding-right: 15.1px;">የአገልግሎት ክፍያ / SERVICE FEE</td>
-          <td class="amount-cell">10.00 BIRR</td>
-        </tr>
-        <tr>
-          <td colspan="2" style="text-align: right; padding-right: 15.1px;">የኮሚሽን ክፍያ / COMMISSION FEE</td>
-          <td class="amount-cell">2.00 BIRR</td>
+          <td>RCP-2024-87654321</td>
+          <td>22-12-2024 09:23:31</td>
+          <td class="amount-cell">2,000.00 BIRR</td>
         </tr>
         <tr>
           <td colspan="2" style="text-align: right; padding-right: 15.1px;">15% VAT</td>
-          <td class="amount-cell">1.80 BIRR</td>
+          <td class="amount-cell">0.00 BIRR</td>
         </tr>
         <tr class="total-row">
           <td colspan="2" style="text-align: right; padding-right: 15.1px;">ጠቅላላ / TOTAL AMOUNT</td>
-          <td class="amount-cell">283.80 BIRR</td>
+          <td class="amount-cell">2,000.00 BIRR</td>
         </tr>
       </tbody>
     </table>
@@ -449,18 +404,10 @@
     <div class="stamp-target" style="position: relative;">
     <div class="info-group">
       <span class="label"><span class="amharic">ጠቅላላ መጠን በቃላት /</span> TOTAL AMOUNT IN WORD</span>
-      <span class="value amount-words">Two Hundred Eighty-Three Birr and Eighty Cents Only</span>
+      <span class="value amount-words">Two Thousand Birr Only</span>
     </div>
     <div class="info-group">
-      <span class="label"><span class="amharic">የተቀናሽ ሂሳብ /</span> DEBIT ACCOUNT</span>
-      <span class="value">M-PESA Float A/C - 876543</span>
-    </div>
-    <div class="info-group">
-      <span class="label"><span class="amharic">የግብይት ዓይነት /</span> TRANSACTION TYPE</span>
-      <span class="value">Pay Utility - Water</span>
-    </div>
-    <div class="info-group">
-      <span class="label"><span class="amharic">የክፍያ መንገድ /</span> PAYMENT CHANNEL</span>
+      <span class="label"><span class="amharic">የግብይት መነሻ /</span> USED CHANNEL</span>
       <span class="value">M-PESA App</span>
     </div>
     <div class="stamp-watermark">
@@ -468,8 +415,8 @@
   </div>
   </div>
     <div class="info-group">
-      <span class="label"><span class="amharic">የክፍያ ምክንያት /</span> PAYMENT REASON</span>
-      <span class="value">Water Bill Payment</span>
+      <span class="label"><span class="amharic">የግብይት ምክንያት /</span> TRANSACTION REASON</span>
+      <span class="value">Cash Deposit</span>
     </div>
   </div>
 

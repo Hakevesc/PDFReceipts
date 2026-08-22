@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M-PESA Cash In Receipt</title>
+<title>M-PESA Cashout Receipt</title>
 <style>
  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
@@ -250,15 +250,14 @@
  .stamp-watermark {
  position: absolute;
  top: 50%;
- right: 15.1px;
- width: 199.5px;
- height: 199.5px;
+ right: 25.1px;
+ width: 179.6px;
+ height: 179.6px;
  opacity: 0.95;
  
  pointer-events: none;
  z-index: 101;
- transform: translateY(-50%) rotate(-12deg);
- }
+ transform: translateY(-50%) rotate(-12deg); mix-blend-mode: multiply;}
 
  .stamp-watermark img {
  width: 100%;
@@ -340,24 +339,24 @@
   <!-- Transaction Information -->
   <div class="transaction-info">
     <div class="info-row">
-      <span class="info-label"><span class="amharic">የላኪው ስም /</span> SENDER NAME</span>
+      <span class="info-label"><span class="amharic">የላኪው ስም /</span> SENDER CUSTOMER NAME</span>
+      <span class="info-value">Abel Agegnehu Gobena</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label"><span class="amharic">የላኪው ስልክ ቁጥር /</span> SENDER PHONE NUMBER</span>
+      <span class="info-value">251911223344</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label"><span class="amharic">የተቀባይ ድርጅት ስም /</span> RECEIVER BUSINESS NAME</span>
       <span class="info-value">Betty Merhat Agency</span>
     </div>
     <div class="info-row">
-      <span class="info-label"><span class="amharic">የላኪው አጭር ኮድ /</span> SENDER SHORT CODE</span>
+      <span class="info-label"><span class="amharic">የተቀባይ አጭር ኮድ /</span> RECEIVER SHORT CODE</span>
       <span class="info-value">876543</span>
     </div>
     <div class="info-row">
-      <span class="info-label"><span class="amharic">የላኪው TIN ቁጥር /</span> SENDER TIN NO</span>
+      <span class="info-label"><span class="amharic">የተቀባይ TIN ቁጥር /</span> RECEIVER TIN NO</span>
       <span class="info-value">0098765432</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label"><span class="amharic">የተቀባይ ስም /</span> RECEIVER NAME</span>
-      <span class="info-value">Abebe Kebede Bekele</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label"><span class="amharic">የተቀባይ ስልክ ቁጥር /</span> RECEIVER PHONE NUMBER</span>
-      <span class="info-value">251911223344</span>
     </div>
     <div class="info-row">
       <span class="info-label"><span class="amharic">መጠን /</span> AMOUNT</span>
@@ -365,7 +364,7 @@
     </div>
     <div class="info-row">
       <span class="info-label"><span class="amharic">የግብይት መታወቂያ /</span> TRANSACTION ID</span>
-      <span class="info-value">DCK87654321</span>
+      <span class="info-value">QCK45632578</span>
     </div>
   </div>
 
@@ -378,13 +377,13 @@
       <thead>
         <tr>
           <th style="width: 33%;"><span class="amharic">ደረሰኝ ቁጥር /</span> RECEIPT NO</th>
-          <th style="width: 33%;"><span class="amharic">የግብይት ቀንና ሰዓት /</span> TRANSACTION DATE AND TIME</th>
-          <th style="width: 34%;"><span class="amharic">የተቀማጭ መጠን /</span> DEPOSIT AMOUNT</th>
+          <th style="width: 33%;"><span class="amharic">የግብይት ቀን /</span> TRANSACTION DATE</th>
+          <th style="width: 34%;"><span class="amharic">የወጪ መጠን /</span> WITHDRAW AMOUNT</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>RCP-2024-87654321</td>
+          <td>RCP-2024-12345678</td>
           <td>22-12-2024 09:23:31</td>
           <td class="amount-cell">2,000.00 BIRR</td>
         </tr>
@@ -408,6 +407,14 @@
       <span class="value amount-words">Two Thousand Birr Only</span>
     </div>
     <div class="info-group">
+      <span class="label"><span class="amharic">የተቀናሽ ሂሳብ /</span> CREDIT ACCOUNT</span>
+      <span class="value">M-PESA Float A/C - 876543</span>
+    </div>
+    <div class="info-group">
+      <span class="label"><span class="amharic">የግብይት ዓይነት /</span> TRANSACTION TYPE</span>
+      <span class="value">Cashout</span>
+    </div>
+    <div class="info-group">
       <span class="label"><span class="amharic">የግብይት መነሻ /</span> USED CHANNEL</span>
       <span class="value">M-PESA App</span>
     </div>
@@ -417,7 +424,7 @@
   </div>
     <div class="info-group">
       <span class="label"><span class="amharic">የግብይት ምክንያት /</span> TRANSACTION REASON</span>
-      <span class="value">Cash Deposit</span>
+      <span class="value">Cash Withdrawal</span>
     </div>
   </div>
 

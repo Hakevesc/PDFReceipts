@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M-PESA Pay Utility DSTV Receipt</title>
+<title>M-PESA Pay Utility Receipt</title>
 <style>
  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
@@ -100,7 +100,7 @@
  border: 2px solid #FE353D;
  padding: 9.4px 0;
  text-align: center;
- margin: 15.1px 0 18.9px;
+ margin: 15.1px 0 22.7px;
  }
 
  .title-box h1 {
@@ -114,12 +114,12 @@
 
  /* ===== TRANSACTION INFO ===== */
  .transaction-info {
- margin-bottom: 18.9px;
+ margin-bottom: 22.7px;
  }
 
  .info-row {
  display: flex;
- padding: 4.9px 0;
+ padding: 5.7px 0;
  gap: 61.2px;
  font-size: 12px;
  }
@@ -145,7 +145,7 @@
 
  /* ===== TRANSACTION DETAIL TABLE ===== */
  .detail-section {
- margin-bottom: 18.9px;
+ margin-bottom: 22.7px;
  }
 
  .section-header {
@@ -208,14 +208,14 @@
 
  /* ===== ADDITIONAL INFO ===== */
  .additional-info {
- margin-bottom: 18.9px;
+ margin-bottom: 22.7px;
  padding-top: 15.1px;
  border-top: 1px solid #E0E0E0;
  }
 
  .info-group {
  display: flex;
- padding: 4.9px 0;
+ padding: 5.7px 0;
  gap: 61.2px;
  font-size: 12px;
  }
@@ -250,15 +250,14 @@
  .stamp-watermark {
  position: absolute;
  top: 50%;
- right: 15.1px;
- width: 193.5px;
- height: 193.5px;
+ right: 25.1px;
+ width: 179.6px;
+ height: 179.6px;
  opacity: 0.95;
  
  pointer-events: none;
  z-index: 101;
- transform: translateY(-50%) rotate(-12deg);
- }
+ transform: translateY(-50%) rotate(-12deg); mix-blend-mode: multiply;}
 
  .stamp-watermark img {
  width: 100%;
@@ -348,12 +347,8 @@
       <span class="info-value">876543</span>
     </div>
     <div class="info-row">
-      <span class="info-label"><span class="amharic">የጥቅል ስም /</span> PACKAGE NAME</span>
-      <span class="info-value">Compact Plus</span>
-    </div>
-    <div class="info-row">
       <span class="info-label"><span class="amharic">የማመሳከሪያ ቁጥር /</span> REFERENCE NUMBER</span>
-      <span class="info-value">SC-1234567890 / Kidist A.</span>
+      <span class="info-value">PNR-2024-123456 / Kidist A.</span>
     </div>
     <div class="info-row">
       <span class="info-label"><span class="amharic">የከፋዩ TIN ቁጥር /</span> PAYER TIN NO</span>
@@ -361,11 +356,7 @@
     </div>
     <div class="info-row">
       <span class="info-label"><span class="amharic">የተቀባይ ድርጅት ስም /</span> RECEIVER BUSINESS NAME</span>
-      <span class="info-value">DSTV Ethiopia</span>
-    </div>
-    <div class="info-row">
-      <span class="info-label"><span class="amharic">የክፍያ ወር /</span> BILL MONTH</span>
-      <span class="info-value">May-26</span>
+      <span class="info-value">Ethiopian Airlines</span>
     </div>
     <div class="info-row">
       <span class="info-label"><span class="amharic">መጠን /</span> AMOUNT</span>
@@ -373,7 +364,7 @@
     </div>
     <div class="info-row">
       <span class="info-label"><span class="amharic">የግብይት መታወቂያ /</span> TRANSACTION ID</span>
-      <span class="info-value">DST99887766</span>
+      <span class="info-value">ETP11223344</span>
     </div>
   </div>
 
@@ -386,14 +377,14 @@
       <thead>
         <tr>
           <th style="width: 33%;"><span class="amharic">ደረሰኝ ቁጥር /</span> RECEIPT NO</th>
-          <th style="width: 33%;"><span class="amharic">የክፍያ ቀንና ሰዓት /</span> PAYMENT DATE AND TIME</th>
+          <th style="width: 33%;"><span class="amharic">የክፍያ ቀን /</span> PAYMENT DATE</th>
           <th style="width: 34%;"><span class="amharic">መጠን /</span> AMOUNT</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>RCP-2024-99887766</td>
-          <td>12-12-2024 14:30:00</td>
+          <td>RCP-2024-11223344</td>
+          <td>12-12-2024 11:00:00</td>
           <td class="amount-cell">2,000.00 BIRR</td>
         </tr>
         <tr>
@@ -429,7 +420,7 @@
   </div>
     <div class="info-group">
       <span class="label"><span class="amharic">የክፍያ ምክንያት /</span> PAYMENT REASON</span>
-      <span class="value">DSTV Subscription - Compact Plus</span>
+      <span class="value">ET Ticket Payment - Addis Ababa</span>
     </div>
   </div>
 

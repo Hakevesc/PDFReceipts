@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M-PESA Agency Banking Cash In Receipt</title>
+<title>M-PESA Receipt</title>
 <style>
  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
  
@@ -44,7 +44,8 @@
  .info-group .label .amharic { font-weight: 400; color: #555; }
 .info-group .value { flex: 1; color: #1C1C21; font-weight: 600; }
  .amount-words { font-style: italic; color: #1C1C21; font-weight: 600; }
- .stamp-watermark { position: absolute; top: 50%; right: 15.1px; width: 199.5px; height: 199.5px; opacity: 0.95; pointer-events: none; z-index: 101; transform: translateY(-50%) rotate(-12deg); }
+ .stamp-target { position: relative; }
+ .stamp-watermark { position: absolute; top: 50%; right: 25.1px; width: 179.6px; height: 179.6px; opacity: 0.95; pointer-events: none; z-index: 101; transform: translateY(-50%) rotate(-12deg); mix-blend-mode: multiply;}
  .stamp-watermark img { width: 100%; height: 100%; object-fit: contain; }
  .footer { text-align: center; padding: 15.1px 0 11.3px; border-top: 1px solid #E0E0E0; font-size: 11.3px; color: #1C1C21; font-weight: 500; letter-spacing: 0.5px; margin-top: auto; }
  .footer-bar { position: absolute; bottom: 0; left: 0; right: 0; background: #FE353D; padding: 11.3px 22.7px; display: flex; justify-content: flex-end; align-items: center; }
@@ -77,40 +78,38 @@
   </div>
   <div class="title-box"><h1>TRANSACTION INFORMATION</h1></div>
   <div class="transaction-info">
-    <div class="info-row"><span class="info-label"><span class="amharic">የላኪ ስም /</span> SENDER NAME</span><span class="info-value">Betty Merhat Agency</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">የላኪ አጭር ኮድ /</span> SENDER SHORT CODE</span><span class="info-value">876543</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">የላኪ TIN ቁጥር /</span> SENDER TIN NO</span><span class="info-value">0098765432</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">የተቀባይ ባንክ ስም /</span> RECEIVER BANK NAME</span><span class="info-value">CBE</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">የተቀባይ ባንክ ሂሳብ ቁጥር /</span> RECEIVER BANK<br>ACCOUNT NUMBER &amp; NAME</span><span class="info-value">1000023456789 / Abebe Kebede</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የከፋዩ ስም /</span> PAYER NAME</span><span class="info-value">Betty Merhat Agency</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የከፋዩ አጭር ኮድ /</span> PAYER SHORT CODE</span><span class="info-value">876543</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የማመሳከሪያ ቁጥር /</span> REFERENCE<br>NUMBER &amp; NAME</span><span class="info-value">PNR-2024-123456 / Kidist A.</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የከፋዩ TIN ቁጥር /</span> PAYER TIN NO</span><span class="info-value">0098765432</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የተቀባይ ድርጅት ስም /</span> RECEIVER BUSINESS NAME</span><span class="info-value">Ethiopian Airlines</span></div>
     <div class="info-row"><span class="info-label"><span class="amharic">መጠን /</span> AMOUNT</span><span class="info-value">2,000.00 BIRR</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">የግብይት መታወቂያ /</span> TRANSACTION ID</span><span class="info-value">ACI87654321</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የግብይት መታወቂያ /</span> TRANSACTION ID</span><span class="info-value">ETC89012345</span></div>
   </div>
   <div class="detail-section">
     <div class="section-header"><h2>TRANSACTION DETAIL</h2></div>
     <table class="detail-table">
-      <thead>
-        <tr>
-          <th style="width: 33%;"><span class="amharic">ደረሰኝ ቁጥር /</span> RECEIPT NO</th>
-          <th style="width: 33%;"><span class="amharic">የግብይት ቀንና ሰዓት /</span> TRANSACTION DATE AND TIME</th>
-          <th style="width: 34%;"><span class="amharic">መጠን /</span> AMOUNT</th>
-        </tr>
-      </thead>
+      <thead><tr><th style="width: 33%;"><span class="amharic">ደረሰኝ ቁጥር /</span> RECEIPT NO</th><th style="width: 33%;"><span class="amharic">የክፍያ ቀን /</span> PAYMENT DATE</th><th style="width: 34%;"><span class="amharic">መጠን /</span> AMOUNT</th></tr></thead>
       <tbody>
-        <tr><td>RCP-2024-87654321</td><td>12-12-2024 09:15:00</td><td class="amount-cell">2,000.00 BIRR</td></tr>
-        <tr><td colspan="2" style="text-align: right; padding-right: 15.1px;">የአገልግሎት ክፍያ / SERVICE FEE</td><td class="amount-cell">10.00 BIRR</td></tr>
-        <tr><td colspan="2" style="text-align: right; padding-right: 15.1px;">15% VAT</td><td class="amount-cell">1.50 BIRR</td></tr>
-        <tr class="total-row"><td colspan="2" style="text-align: right; padding-right: 15.1px;">ጠቅላላ / TOTAL AMOUNT</td><td class="amount-cell">2,011.50 BIRR</td></tr>
+        <tr><td>RCP-2024-CUST90123</td><td>12-12-2024 11:00:00</td><td class="amount-cell">2,000.00 BIRR</td></tr>
+        <tr><td colspan="2" style="text-align: right; padding-right: 15.1px;">የአገልግሎት ክፍያ / SERVICE FEE</td><td class="amount-cell">15.00 BIRR</td></tr>
+        <tr><td colspan="2" style="text-align: right; padding-right: 15.1px;">የኮሚሽን ክፍያ / COMMISSION FEE</td><td class="amount-cell">5.00 BIRR</td></tr>
+        <tr><td colspan="2" style="text-align: right; padding-right: 15.1px;">15% VAT</td><td class="amount-cell">3.60 BIRR</td></tr>
+        <tr class="total-row"><td colspan="2" style="text-align: right; padding-right: 15.1px;">ጠቅላላ / TOTAL AMOUNT</td><td class="amount-cell">2,023.60 BIRR</td></tr>
       </tbody>
     </table>
   </div>
   <div class="additional-info">
-    <div class="stamp-target" style="position: relative;">
-    <div class="info-group"><span class="label"><span class="amharic">ጠቅላላ መጠን በቃላት /</span> TOTAL AMOUNT IN WORD</span><span class="value amount-words">Two Thousand Eleven Birr and Fifty Cents Only</span></div>
-    <div class="stamp-watermark"><img src="assets/M-PESA-official_stamp.png" alt="M-PESA Stamp"></div>
+    <div class="stamp-target">
+      <div class="info-group"><span class="label"><span class="amharic">ጠቅላላ መጠን በቃላት /</span> TOTAL AMOUNT IN WORD</span><span class="value">Two Thousand Twenty-Three Birr and Sixty Cents Only</span></div>
+      <div class="info-group"><span class="label"><span class="amharic">የተቀናሽ ሂሳብ /</span> DEBIT ACCOUNT</span><span class="value">Betty Merhat Agency - 876543</span></div>
+      <div class="stamp-watermark"><img src="assets/M-PESA-official_stamp.png" alt="M-PESA Stamp"></div>
   </div>
-    <div class="info-group"><span class="label"><span class="amharic">የግብይት ዓይነት /</span> TRANSACTION TYPE</span><span class="value">Agency Banking Cash In</span></div>
-    <div class="info-group"><span class="label"><span class="amharic">የክፍያ ምክንያት /</span> PAYMENT REASON</span><span class="value">Cash Deposit to Bank Account</span></div>
+    <div class="info-group"><span class="label"><span class="amharic">የግብይት ዓይነት /</span> TRANSACTION TYPE</span><span class="value">Pay Utility - ET</span></div>
+    <div class="info-group"><span class="label"><span class="amharic">የክፍያ መንገድ /</span> PAYMENT CHANNEL</span><span class="value">M-PESA App</span></div>
+    <div class="info-group"><span class="label"><span class="amharic">የክፍያ ምክንያት /</span> PAYMENT REASON</span><span class="value">ET Ticket Payment - Addis Ababa</span></div>
   </div>
+
 
   <div class="footer">M-PESAን ስለተጠቀሙ እናመሰግናለን / THANK YOU FOR USING M-PESA</div>
   <div class="footer-bar"><img src="assets/M-PESA-white-logo.svg" alt="M-PESA"></div>
@@ -118,7 +117,6 @@
 <script defer src="assets/comments.js"></script>
 </body>
 </html>
-
 
 
 

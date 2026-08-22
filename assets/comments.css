@@ -110,18 +110,24 @@ html:not(.rc-has-rail) #rc-rail { transform: translateX(100%); }
   border-bottom: 1px solid var(--rc-border);
 }
 
-.rc-rail-title {
+/* The receipt this panel belongs to, stated plainly at the top */
+.rc-rail-name {
   font-family: 'Poppins', 'Inter', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.2px;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.1px;
+  color: var(--rc-ink);
+  word-break: break-word;
 }
 
-.rc-rail-sub {
-  margin-top: 3px;
+.rc-rail-title {
+  margin-top: 6px;
   font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
   color: var(--rc-ink-low);
-  word-break: break-word;
 }
 
 .rc-rail-hint {
@@ -278,6 +284,22 @@ html:not(.rc-has-rail) #rc-rail { transform: translateX(100%); }
 
 .rc-link:hover { color: var(--rc-primary); }
 .rc-link.rc-done:hover { color: var(--rc-success); }
+.rc-link.rc-del:hover { color: var(--rc-primary-dark); }
+
+/* Admin-only actions carry a small padlock until the passphrase is entered */
+.rc-link.rc-locked { opacity: 0.55; }
+
+.rc-link.rc-locked::after {
+  content: " F512";
+  font-size: 9px;
+}
+
+.rc-thread-foot .rc-del { margin-left: auto; }
+
+.rc-status.rc-notice {
+  background: #EEF7EE;
+  color: #226B2C;
+}
 
 /* ---------- composer ---------- */
 

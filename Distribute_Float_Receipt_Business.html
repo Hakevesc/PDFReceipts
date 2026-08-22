@@ -1,20 +1,20 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M-PESA Receipt</title>
+<title>M-PESA Distribute Float Receipt</title>
 <style>
  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
  
  * { margin: 0; padding: 0; box-sizing: border-box; }
- body { font-family: 'Inter', Arial, sans-serif; background: #E8E8E8; display: flex; justify-content: center; padding: 20px; color: #1C1C21; }
- .page { width: 793.7px; min-height: 1122.5px; background: #FFF; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.15); padding: 45.4px 52.9px; display: flex; flex-direction: column; padding-bottom: 75.6px; }
+ body { display: flex; justify-content: center; padding: 20px; font-family: 'Inter', Arial, sans-serif; background: #E8E8E8; color: #1C1C21; }
+ .page { width: 793.7px; min-height: 1122.5px; background: #FFF; position: relative; padding: 45.4px 52.9px; display: flex; flex-direction: column; padding-bottom: 75.6px;  box-shadow: 0 10px 40px rgba(0,0,0,0.15);}
  .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15.1px; padding-bottom: 15.1px; border-bottom: 1px solid #E0E0E0; }
  .header-left { flex: 1; }
  .mpesa-logo { height: 56.7px; width: auto; margin-bottom: 11.3px; }
  .company-name { font-family: 'Poppins', sans-serif; font-size: 14.7px; font-weight: 700; color: #1C1C21; margin-bottom: 7.6px; }
- .company-details { font-size: 13.3px; color: #1C1C21; line-height: 2.4; font-weight: 400; }
+ .company-details { font-size: 13.3px; color: #1C1C21; line-height: 2.3; font-weight: 400; }
  .company-details .label { font-weight: 400; color: #666; letter-spacing: 0.3px; }
  .company-details .bold-val { font-weight: 700; color: #1C1C21; }
  .qr-section { text-align: center; }
@@ -44,14 +44,14 @@
  .info-group .label .amharic { font-weight: 400; color: #555; }
 .info-group .value { flex: 1; color: #1C1C21; font-weight: 600; }
  .amount-words { font-style: italic; color: #1C1C21; font-weight: 600; }
- .stamp-watermark { position: absolute; top: 50%; right: 15.1px; width: 199.5px; height: 199.5px; opacity: 0.95; pointer-events: none; z-index: 101; transform: translateY(-50%) rotate(-12deg); mix-blend-mode: multiply; }
+ .stamp-watermark { position: absolute; top: 50%; right: 25.1px; width: 179.6px; height: 179.6px; opacity: 0.95; pointer-events: none; z-index: 101; transform: translateY(-50%) rotate(-12deg); mix-blend-mode: multiply;}
  .stamp-watermark img { width: 100%; height: 100%; object-fit: contain; }
- .footer { text-align: center; padding: 15.1px 0 11.3px; border-top: 1px solid #E0E0E0; font-size: 11.3px; color: #1C1C21; font-weight: 500; letter-spacing: 0.5px; margin-top: auto; }
+ .footer { text-align: center; padding: 15.1px 0 11.3px; margin-top: auto; border-top: 1px solid #E0E0E0; font-size: 11.3px; color: #1C1C21; font-weight: 500; letter-spacing: 0.5px; }
  .footer-bar { position: absolute; bottom: 0; left: 0; right: 0; background: #FE353D; padding: 11.3px 22.7px; display: flex; justify-content: flex-end; align-items: center; }
  .footer-bar img { height: 30.2px; width: auto; }
  .mpesa-watermark-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-25deg); font-family: 'Poppins', sans-serif; font-size: 140px; font-weight: 900; color: rgba(180, 180, 180, 0.2); letter-spacing: 12px; white-space: nowrap; pointer-events: none; z-index: 100; user-select: none; }
- @media print { body { background: #FFF; padding: 0; } .page { box-shadow: none; width: 793.7px; min-height: 1122.5px; } }
- @media screen and (max-width: 800px) { .page { width: 100%; min-height: auto; } body { padding: 10px; } }
+ @media print { body { background: #FFF; padding: 0; } .page { box-shadow: none; width: 793.7px; height: 1122.5px; display: flex; flex-direction: column; padding-bottom: 75.6px; } }
+ @media screen and (max-width: 800px) { .page { width: 100%; min-height: auto; display: flex; flex-direction: column; padding-bottom: 75.6px; } body { } }
 </style>
 </head>
 <body>
@@ -65,43 +65,53 @@
         <span class="label">TIN NO:</span> <span class="bold-val">0084242753</span><br>
         <span class="label">VAT REG NO:</span> <span class="bold-val">22371880003</span><br>
         <span class="label">Address:</span> <span class="bold-val">Addis Ababa, Kirkos Woreda 1</span><br>
-        <span class="label">Tel:</span> <span class="bold-val">+251 756 765434</span>
+<span class="label">Tel:</span> <span class="bold-val">+251 756 765434</span><br>
       </div>
+    </div>
+    <div class="qr-section">
+      <div class="qr-code">
+        <img src="assets/qr-placeholder.svg" alt="QR Code" >
+      </div>
+      <div class="qr-label">SCAN TO VERIFY</div>
     </div>
   </div>
   <div class="title-box"><h1>TRANSACTION INFORMATION</h1></div>
   <div class="transaction-info">
-    <div class="info-row"><span class="info-label"><span class="amharic">የከፋዩ ስም /</span> PAYER NAME</span><span class="info-value">Amanuel Getenet Kassahun</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">የከፋዩ አጭር ኮድ /</span> PAYER SHORT CODE</span><span class="info-value">7056271</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">የከፋዩ TIN ቁጥር /</span> PAYER TIN NO</span><span class="info-value">0093041627</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">የተቀባይ ድርጅት ስም /</span> RECEIVER<br>ORGANIZATION NAME</span><span class="info-value">Ethiopian Electric Utility (EEU)</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">የውል ቁጥር /</span> REFERENCE / CONTRACT NUMBER</span><span class="info-value">100001011057</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">የደንበኛ ስም /</span> CUSTOMER NAME</span><span class="info-value">Tigist Guadie Temesgen</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">የክፍያ ወር /</span> BILL MONTH</span><span class="info-value">June-06</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">መጠን /</span> AMOUNT</span><span class="info-value">4,330.14 BIRR</span></div>
-    <div class="info-row"><span class="info-label"><span class="amharic">የግብይት መታወቂያ /</span> TRANSACTION ID</span><span class="info-value">UH30F5QUJU</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የላኪ ስም /</span> SENDER NAME</span><span class="info-value">Betty Merhat Agency</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የላኪ አጭር ኮድ /</span> SENDER SHORT CODE</span><span class="info-value">876543</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የላኪ TIN ቁጥር /</span> SENDER TIN NO</span><span class="info-value">0098765432</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የተቀባይ ስም /</span> RECEIVER NAME</span><span class="info-value">Hana Retail Agent</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የተቀባይ አጭር ኮድ /</span> RECEIVER SHORT CODE</span><span class="info-value">554433</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">መጠን /</span> AMOUNT</span><span class="info-value">50,000.00 BIRR</span></div>
+    <div class="info-row"><span class="info-label"><span class="amharic">የግብይት መታወቂያ /</span> TRANSACTION ID</span><span class="info-value">DFL40586978</span></div>
   </div>
   <div class="detail-section">
     <div class="section-header"><h2>TRANSACTION DETAIL</h2></div>
     <table class="detail-table">
-      <thead><tr><th style="width: 33%;"><span class="amharic">ደረሰኝ ቁጥር /</span> RECEIPT NO</th><th style="width: 33%;"><span class="amharic">የክፍያ ቀን /</span> PAYMENT DATE</th><th style="width: 34%;"><span class="amharic">ጠቅላላ የክፍያ መጠን /</span> TOTAL BILL AMOUNT</th></tr></thead>
+      <thead>
+        <tr>
+          <th style="width: 33%;"><span class="amharic">ደረሰኝ ቁጥር /</span> RECEIPT NO</th>
+          <th style="width: 33%;"><span class="amharic">የግብይት ቀንና ሰዓት /</span> TRANSACTION DATE &amp; TIME</th>
+          <th style="width: 34%;"><span class="amharic">የዝውውር መጠን /</span> TRANSFER AMOUNT</th>
+        </tr>
+      </thead>
       <tbody>
-        <tr><td>RCP-2024-CUST45678</td><td>3/8/26 at 10:45 AM</td><td class="amount-cell">4,330.14 BIRR</td></tr>
-        <tr><td colspan="2" style="text-align: right; padding-right: 15.1px;">የአገልግሎት ክፍያ / SERVICE FEE</td><td class="amount-cell">1.00 BIRR</td></tr>
-        <tr><td colspan="2" style="text-align: right; padding-right: 15.1px;">15% VAT</td><td class="amount-cell">0.15 BIRR</td></tr>
-        <tr class="total-row"><td colspan="2" style="text-align: right; padding-right: 15.1px;">ጠቅላላ / TOTAL AMOUNT</td><td class="amount-cell">4,331.29 BIRR</td></tr>
+        <tr><td>RCP-2024-40586978</td><td>12-12-2024 15:00:00</td><td class="amount-cell">50,000.00 BIRR</td></tr>
+        <tr><td colspan="2" style="text-align: right; padding-right: 15.1px;">15% VAT</td><td class="amount-cell">0.00 BIRR</td></tr>
+        <tr class="total-row"><td colspan="2" style="text-align: right; padding-right: 15.1px;">ጠቅላላ / TOTAL AMOUNT</td><td class="amount-cell">50,000.00 BIRR</td></tr>
       </tbody>
     </table>
   </div>
   <div class="additional-info">
     <div class="stamp-target" style="position: relative;">
-    <div class="info-group"><span class="label"><span class="amharic">ጠቅላላ መጠን በቃላት /</span> TOTAL AMOUNT IN WORD</span><span class="value">Four Thousand Three Hundred Thirty-One Birr and Twenty-Nine Cents Only</span></div>
+    <div class="info-group"><span class="label"><span class="amharic">ጠቅላላ መጠን በቃላት /</span> TOTAL AMOUNT IN WORD</span><span class="value amount-words">Fifty Thousand Birr Only</span></div>
+    <div class="info-group"><span class="label"><span class="amharic">የተቀናሽ ሂሳብ /</span> DEBIT ACCOUNT</span><span class="value">M-PESA Float A/C - 876543</span></div>
     <div class="stamp-watermark"><img src="assets/M-PESA-official_stamp.png" alt="M-PESA Stamp"></div>
   </div>
-    <div class="info-group"><span class="label"><span class="amharic">የግብይት ዓይነት /</span> TRANSACTION TYPE</span><span class="value">Pay Utility - EEU</span></div>
-    <div class="info-group"><span class="label"><span class="amharic">የክፍያ ምክንያት /</span> PAYMENT REASON</span><span class="value">Electricity Bill Payment</span></div>
+    <div class="info-group"><span class="label"><span class="amharic">የግብይት ዓይነት /</span> TRANSACTION TYPE</span><span class="value">Distribute Float</span></div>
+    <div class="info-group"><span class="label"><span class="amharic">የግብይት መነሻ /</span> USED CHANNEL</span><span class="value">M-PESA App</span></div>
+    <div class="info-group"><span class="label"><span class="amharic">የግብይት ምክንያት /</span> TRANSACTION REASON</span><span class="value">Float Distribution to Sub-Agent</span></div>
   </div>
-
 
   <div class="footer">M-PESAን ስለተጠቀሙ እናመሰግናለን / THANK YOU FOR USING M-PESA</div>
   <div class="footer-bar"><img src="assets/M-PESA-white-logo.svg" alt="M-PESA"></div>
@@ -109,3 +119,9 @@
 <script defer src="assets/comments.js"></script>
 </body>
 </html>
+
+
+
+
+
+

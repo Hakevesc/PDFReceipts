@@ -22,7 +22,21 @@
     anonKey:
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxYWpxbmpqdmZkbXVmb2RsaXFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0MDU3NTUsImV4cCI6MjEwMjk4MTc1NX0.k-kUdmD0TQ6RhPkwy3dYf7F825o7rf69n0SGklRViM4',
     table: 'comments',
-    clientModule: 'https://esm.sh/@supabase/supabase-js@2'
+    clientModule: 'https://esm.sh/@supabase/supabase-js@2',
+
+    // Resolve and Delete are reserved for whoever holds this passphrase.
+    // Stored as a SHA-256 digest so the phrase itself is not in the source.
+    // To change it, run in any browser console:
+    //   crypto.subtle.digest('SHA-256', new TextEncoder().encode('NEW PHRASE'))
+    //     .then(b => console.log([...new Uint8Array(b)]
+    //       .map(x => x.toString(16).padStart(2, '0')).join('')))
+    // and paste the result here.
+    //
+    // This gates the UI, not the database: the anon key is public, so a
+    // determined visitor could still call the API directly. It stops casual
+    // resolving and deleting, nothing more. Real enforcement needs Supabase
+    // Auth with policies keyed to an authenticated role.
+    adminHash: '285c8a142b1a2fbcb4eca3f4f7c7fa7f70667bc06417f3643e3c9b32bd29c32a'
   };
 
   const RAIL_WIDTH = 340;
@@ -46,6 +60,13 @@
     location.pathname.split('/').pop() || 'unknown.html'
   );
 
+  // Agency_Banking_Cashin_Receipt_Business.html -> Agency Banking Cashin Business
+  const receiptName = receipt
+    .replace(/\.html$/i, '')
+    .split(/[_\s]+/)
+    .filter((w) => w && w.toLowerCase() !== 'receipt')
+    .join(' ');
+
   const state = {
     threads: [],          // [{root, replies:[], anchor:{...}, el, pin, n}]
     armed: false,
@@ -54,7 +75,9 @@
     activeId: null,
     supabase: null,
     error: null,
-    pending: null         // anchor awaiting its first comment
+    pending: null,        // anchor awaiting its first comment
+    admin: localStorage.getItem('rc-admin') === '1',
+    notice: null          // transient message shown in the rail
   };
 
   let page, pinLayer, rail, railBody, toggle;
@@ -172,6 +195,41 @@
 
     // 3. coordinates — always resolvable, flagged so the rail can say so
     return { node: null, orphan: true };
+  }
+
+  /* ----------------------------------------------------------- admin gate */
+
+  async function sha256(text) {
+    const buf = await crypto.subtle.digest(
+      'SHA-256', new TextEncoder().encode(text)
+    );
+    return [...new Uint8Array(buf)]
+      .map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  function flash(msg) {
+    state.notice = msg;
+    render();
+    clearTimeout(flash.t);
+    flash.t = setTimeout(() => { state.notice = null; render(); }, 4000);
+  }
+
+  // Asks once, then remembers. Returns true when the visitor is an admin.
+  async function requireAdmin(action) {
+    if (state.admin) return true;
+    const NL = String.fromCharCode(10);
+    const entry = window.prompt(
+      'Admin only task.' + NL + NL +
+      '"' + action + '" is reserved for admins.' + NL +
+      'Enter the admin password to continue:'
+    );
+    if (entry === null) return false;               // cancelled
+    const ok = (await sha256(entry.trim())) === CONFIG.adminHash;
+    if (!ok) { flash('That password is not right — nothing was changed.'); return false; }
+    state.admin = true;
+    localStorage.setItem('rc-admin', '1');
+    flash('Admin unlocked. You can resolve and delete comments on this browser.');
+    return true;
   }
 
   /* -------------------------------------------------------------- supabase */
@@ -321,6 +379,10 @@
       railBody.appendChild(el('div', 'rc-status rc-error', esc(state.error)));
     }
 
+    if (state.notice) {
+      railBody.appendChild(el('div', 'rc-status rc-notice', esc(state.notice)));
+    }
+
     if (state.pending) {
       railBody.appendChild(composer(state.pending, null));
     }
@@ -387,11 +449,29 @@
       card.appendChild(composer(null, t.root.id));
       card.querySelector('textarea').focus();
     });
-    const done = el('button', 'rc-link rc-done', t.root.resolved ? 'Reopen' : 'Resolve');
+    const label = t.root.resolved ? 'Reopen' : 'Resolve';
+    const done = el('button', 'rc-link rc-done', label);
     done.type = 'button';
-    done.addEventListener('click', () => toggleResolved(t.root));
+    if (!state.admin) done.classList.add('rc-locked');
+    done.addEventListener('click', async () => {
+      if (await requireAdmin(label)) toggleResolved(t.root);
+    });
+
+    const del = el('button', 'rc-link rc-del', 'Delete');
+    del.type = 'button';
+    if (!state.admin) del.classList.add('rc-locked');
+    del.addEventListener('click', async () => {
+      if (!(await requireAdmin('Delete'))) return;
+      const n = t.replies.length;
+      const msg = n
+        ? 'Delete this comment and its ' + n + (n === 1 ? ' reply?' : ' replies?')
+        : 'Delete this comment?';
+      if (window.confirm(msg)) removeThread(t.root);
+    });
+
     foot.appendChild(reply);
     foot.appendChild(done);
+    foot.appendChild(del);
     card.appendChild(foot);
 
     return card;
@@ -407,6 +487,18 @@
       .update({ resolved: next })
       .eq('id', root.id);
     if (error) { state.error = error.message; render(); }
+  }
+
+  async function removeThread(root) {
+    if (!state.supabase) { flash('Not connected — nothing was deleted.'); return; }
+    // replies cascade via the parent_id foreign key
+    const { error } = await state.supabase
+      .from(CONFIG.table)
+      .delete()
+      .eq('id', root.id);
+    if (error) { state.error = error.message; render(); return; }
+    if (state.activeId === root.id) state.activeId = null;
+    await load();
   }
 
   function composer(anchor, parentId) {
@@ -556,8 +648,8 @@
     rail.id = 'rc-rail';
     rail.style.position = 'fixed';
     const head = el('div', 'rc-rail-head');
+    head.appendChild(el('div', 'rc-rail-name', esc(receiptName)));
     head.appendChild(el('div', 'rc-rail-title', 'Comments'));
-    head.appendChild(el('div', 'rc-rail-sub', esc(receipt)));
     head.appendChild(el(
       'div', 'rc-rail-hint',
       'Turn on <b>Comment mode</b>, then click a field to pin a note. ' +
