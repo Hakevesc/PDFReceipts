@@ -60,12 +60,16 @@
     location.pathname.split('/').pop() || 'unknown.html'
   );
 
-  // Agency_Banking_Cashin_Receipt_Business.html -> Agency Banking Cashin Business
-  const receiptName = receipt
-    .replace(/\.html$/i, '')
-    .split(/[_\s]+/)
-    .filter((w) => w && w.toLowerCase() !== 'receipt')
-    .join(' ');
+  // Agency_Banking_Cashin_Receipt_Business_Merchant.html
+  //   -> Agency Banking Cashin Business
+  // Only a TRAILING Merchant/Consumer is dropped, so "Merchant to Bank"
+  // keeps the word where it is part of the receipt's actual name.
+  const receiptName = (() => {
+    const parts = receipt.replace(/\.html$/i, '').split(/[_\s]+/).filter(Boolean);
+    const last = (parts[parts.length - 1] || '').toLowerCase();
+    if (last === 'merchant' || last === 'consumer') parts.pop();
+    return parts.filter((w) => w.toLowerCase() !== 'receipt').join(' ');
+  })();
 
   const state = {
     threads: [],          // [{root, replies:[], anchor:{...}, el, pin, n}]
