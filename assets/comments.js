@@ -615,7 +615,7 @@
     document.documentElement.classList.toggle('rc-armed', on);
     toggle.setAttribute('data-armed', String(on));
     toggle.querySelector('.rc-toggle-label').textContent =
-      on ? 'Click a field…' : 'Comment mode';
+      on ? 'Comment Mode On' : 'Comment Mode Off';
 
     page.querySelectorAll('.rc-commentable').forEach(
       (n) => n.classList.remove('rc-commentable')
@@ -672,23 +672,20 @@
     page.appendChild(pinLayer);
 
     toggle = el('button', null,
-      '<span class="rc-toggle-label">Comment mode</span>' +
+      '<span class="rc-toggle-label">Comment Mode Off</span>' +
       '<span class="rc-toggle-count" data-n="0"></span>');
     toggle.id = 'rc-toggle';
     toggle.type = 'button';
     // Inline, so these never join body's flex flow even if comments.css is
     // missing or blocked. 19 of the receipts make body a flex row, and an
     // in-flow rail would squeeze the A4 page — including in print.
-    toggle.style.position = 'fixed';
-    toggle.addEventListener('click', () => {
-      if (!state.railOpen) { openRail(true); render(); return; }
-      arm(!state.armed);
-    });
+    toggle.addEventListener('click', () => arm(!state.armed));
 
     rail = el('aside');
     rail.id = 'rc-rail';
     rail.style.position = 'fixed';
     const head = el('div', 'rc-rail-head');
+    head.appendChild(toggle);
 
     // previous / next receipt, filled in once the index has been read
     nav = el('div', 'rc-nav');
@@ -722,7 +719,6 @@
       openRail(open);
     });
 
-    document.body.appendChild(toggle);
     document.body.appendChild(handle);
     document.body.appendChild(rail);
 

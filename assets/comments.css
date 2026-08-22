@@ -32,35 +32,32 @@
 
 /* ---------- toggle ---------- */
 
+/* Full-width switch at the top of the rail */
 #rc-toggle {
-  position: fixed;
-  top: 16px;
-  right: calc(var(--rc-rail-w) + 16px);
-  z-index: 1001;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 9px 14px;
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 11px 14px;
   border: 1px solid var(--rc-border);
-  border-radius: 999px;
-  background: var(--rc-surface);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.10);
+  border-radius: 8px;
+  background: var(--rc-surface-alt);
   font: 600 12px/1 'Inter', Arial, sans-serif;
   letter-spacing: 0.3px;
-  color: var(--rc-ink);
+  color: var(--rc-ink-low);
   cursor: pointer;
-  transition: right 0.18s ease, background 0.15s ease, color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
-#rc-toggle:hover { background: var(--rc-surface-alt); }
+#rc-toggle:hover { border-color: #D5D5DC; color: var(--rc-ink); }
 
 #rc-toggle[data-armed="true"] {
   background: var(--rc-primary);
   border-color: var(--rc-primary);
   color: #FFF;
 }
-
-html:not(.rc-has-rail) #rc-toggle { right: 16px; }
 
 #rc-toggle .rc-toggle-count {
   display: inline-flex;
@@ -508,12 +505,6 @@ html.rc-armed .rc-commentable:hover {
   }
 
   html:not(.rc-has-rail) #rc-rail { transform: translateY(100%); }
-
-  #rc-toggle, html:not(.rc-has-rail) #rc-toggle {
-    top: auto;
-    right: 14px;
-    bottom: 14px;
-  }
 
   #rc-handle, html:not(.rc-has-rail) #rc-handle {
     top: auto;
