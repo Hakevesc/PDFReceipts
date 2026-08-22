@@ -81,6 +81,7 @@
   };
 
   let page, pinLayer, rail, railBody, toggle, handle, nav, prevBtn, nextBtn;
+  let navRail, navHandle;
 
   const chevron = (dir) =>
     '<svg class="rc-chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="' +
@@ -202,6 +203,96 @@
     return { node: null, orphan: true };
   }
 
+  /* ------------------------------------------------------ left nav sidebar
+     A copy of the homepage list, so a reviewer can walk the whole set
+     without going back to the index. Built from the same parsed array as
+     Prev / Next, and like the rest of the furniture it is a sibling of
+     .page and hidden in print. */
+
+  function buildNavRail(list) {
+    if (!list.length || navRail) return;
+
+    navRail = el('aside');
+    navRail.id = 'rc-nav-rail';
+    navRail.style.position = 'fixed';
+
+    const head = el('div', 'rc-nav-head');
+    head.appendChild(el('div', 'rc-nav-title', 'Merchant Receipts'));
+    navRail.appendChild(head);
+
+    const body = el('div', 'rc-nav-body');
+
+    [['customer', 'Customer Receipts'], ['business', 'Business Receipts']]
+      .forEach(([group, label], i) => {
+        const items = list.filter((r) => r.group === group);
+        if (!items.length) return;
+
+        const sec = el('div', 'rc-nav-sec');
+        const key = 'rc-nav-open-' + group;
+        const holdsCurrent = items.some((r) => r.file === receipt);
+        const saved = localStorage.getItem(key);
+        // default open on the section holding the receipt being viewed
+        sec.dataset.open = saved !== null ? saved : String(holdsCurrent || i === 0);
+
+        const btn = el('button', 'rc-nav-sec-head');
+        btn.type = 'button';
+        btn.innerHTML =
+          '<span class="rc-nav-sec-name">' + esc(label) + '</span>' +
+          '<span class="rc-nav-sec-count">' + items.length + '</span>' +
+          chevron('right');
+        btn.setAttribute('aria-expanded', sec.dataset.open);
+        btn.addEventListener('click', () => {
+          const open = sec.dataset.open !== 'true';
+          sec.dataset.open = String(open);
+          btn.setAttribute('aria-expanded', String(open));
+          localStorage.setItem(key, String(open));
+        });
+        sec.appendChild(btn);
+
+        const ul = el('div', 'rc-nav-list');
+        items.forEach((r) => {
+          const a = el('a', 'rc-nav-item');
+          a.href = encodeURIComponent(r.file);
+          a.title = r.file;
+          if (r.file === receipt) {
+            a.classList.add('rc-current');
+            a.setAttribute('aria-current', 'page');
+          }
+          a.innerHTML = '<span class="rc-nav-item-name">' + esc(r.name) + '</span>' +
+                        chevron('right');
+          ul.appendChild(a);
+        });
+        sec.appendChild(ul);
+        body.appendChild(sec);
+      });
+
+    navRail.appendChild(body);
+
+    navHandle = el('button', null,
+      chevron('left') + '<span class="rc-handle-label">Receipts</span>');
+    navHandle.id = 'rc-nav-handle';
+    navHandle.type = 'button';
+    navHandle.style.position = 'fixed';
+    navHandle.title = 'Hide or show the receipt list';
+    navHandle.addEventListener('click', () => openNav(
+      !document.documentElement.classList.contains('rc-has-nav')
+    ));
+
+    document.body.appendChild(navHandle);
+    document.body.appendChild(navRail);
+
+    // Both rails plus a 793.7px page need roughly 1480px; below that the
+    // list starts tucked away rather than squeezing the receipt.
+    openNav(window.innerWidth >= 1480);
+
+    const current = navRail.querySelector('.rc-current');
+    if (current) current.scrollIntoView({ block: 'nearest' });
+  }
+
+  function openNav(on) {
+    document.documentElement.classList.toggle('rc-has-nav', on);
+  }
+
   /* ------------------------------------------------------ prev / next nav
      The running order comes from index.html's own receipts array, so the
      panel walks the list in the same sequence the homepage shows. Disabled
@@ -217,12 +308,14 @@
     } catch (_) { return; }
 
     const list = [];
-    const re = /\{\s*name:\s*'([^']+)',\s*file:\s*'([^']+)'[^}]*\}/g;
+    const re = /\{\s*name:\s*'([^']+)',\s*file:\s*'([^']+)',\s*group:\s*'(\w+)'[^}]*\}/g;
     let m;
     while ((m = re.exec(text))) {
       if (/disabled:\s*true/.test(m[0])) continue;
-      list.push({ name: m[1], file: m[2] });
+      list.push({ name: m[1], file: m[2], group: m[3] });
     }
+
+    buildNavRail(list);
 
     const here = list.findIndex((r) => r.file === receipt);
     if (here === -1) return;

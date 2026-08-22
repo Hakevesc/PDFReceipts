@@ -7,6 +7,7 @@
 
 :root {
   --rc-rail-w: 340px;
+  --rc-nav-w: 268px;
   --rc-primary: #FE353D;
   --rc-primary-dark: #C41520;
   --rc-ink: #1C1C21;
@@ -100,6 +101,191 @@ html.rc-css-ready #rc-toggle {
 html:not(.rc-anim) #rc-rail,
 html:not(.rc-anim) #rc-handle {
   transition: none !important;
+}
+
+/* ---------- left rail: the receipt list ---------- */
+
+#rc-nav-rail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--rc-nav-w);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  background: var(--rc-surface);
+  border-right: 1px solid var(--rc-border);
+  font-family: 'Inter', Arial, sans-serif;
+  color: var(--rc-ink);
+  visibility: hidden;
+  transform: translateX(0);
+  transition: transform 0.18s ease;
+}
+
+html.rc-css-ready #rc-nav-rail { visibility: visible; }
+html:not(.rc-anim) #rc-nav-rail { transition: none !important; }
+html:not(.rc-has-nav) #rc-nav-rail { transform: translateX(-100%); }
+
+@media screen and (min-width: 1480px) {
+  html.rc-has-nav body { padding-left: var(--rc-nav-w); }
+}
+
+.rc-nav-head {
+  flex: none;
+  padding: 18px 16px 14px;
+  border-bottom: 1px solid var(--rc-border);
+}
+
+.rc-nav-title {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+}
+
+.rc-nav-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 10px 24px;
+}
+
+.rc-nav-sec { margin-bottom: 6px; }
+
+.rc-nav-sec-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(254, 53, 61, 0.05);
+  font: 600 12px/1 'Inter', Arial, sans-serif;
+  color: var(--rc-ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.rc-nav-sec-head:hover { background: rgba(254, 53, 61, 0.09); }
+
+.rc-nav-sec-name { flex: 1; }
+
+.rc-nav-sec-count {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--rc-ink-low);
+}
+
+.rc-nav-sec-head .rc-chev {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  fill: none;
+  stroke: var(--rc-primary);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform: rotate(90deg);
+  transition: transform 0.18s ease;
+}
+
+.rc-nav-sec[data-open="false"] .rc-chev { transform: rotate(0deg); }
+.rc-nav-sec[data-open="false"] .rc-nav-list { display: none; }
+
+.rc-nav-list { padding: 4px 0 6px; }
+
+.rc-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--rc-ink);
+  text-decoration: none;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.rc-nav-item:hover { background: var(--rc-surface-alt); }
+
+.rc-nav-item-name {
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.rc-nav-item .rc-chev {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  fill: none;
+  stroke: var(--rc-ink-low);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rc-nav-item.rc-current {
+  background: rgba(254, 53, 61, 0.08);
+  color: var(--rc-primary-dark);
+  font-weight: 600;
+}
+
+.rc-nav-item.rc-current .rc-chev { stroke: var(--rc-primary); }
+
+/* its handle mirrors the comments one, on the opposite edge */
+#rc-nav-handle {
+  position: fixed;
+  top: 16px;
+  left: var(--rc-nav-w);
+  z-index: 1002;
+  width: 26px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 0 8px 8px 0;
+  background: var(--rc-primary);
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.16);
+  cursor: pointer;
+  visibility: hidden;
+  transition: left 0.18s ease, background 0.15s ease;
+}
+
+html.rc-css-ready #rc-nav-handle { visibility: visible; }
+html:not(.rc-anim) #rc-nav-handle { transition: none !important; }
+#rc-nav-handle:hover { background: var(--rc-primary-dark); }
+
+html:not(.rc-has-nav) #rc-nav-handle {
+  left: 0;
+  width: auto;
+  padding: 0 11px 0 14px;
+}
+
+html:not(.rc-has-nav) #rc-nav-handle .rc-handle-label { display: inline; }
+
+#rc-nav-handle .rc-chev {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: #FFF;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.18s ease;
+}
+
+html:not(.rc-has-nav) #rc-nav-handle .rc-chev { transform: rotate(180deg); }
+
+@media screen and (max-width: 800px) {
+  #rc-nav-rail { width: min(300px, 88vw); }
+  html.rc-has-nav body { padding-left: 0; }
 }
 
 /* ---------- hide / show handle ---------- */
@@ -573,6 +759,8 @@ html.rc-armed .rc-commentable:hover {
   #rc-rail,
   #rc-toggle,
   #rc-handle,
+  #rc-nav-rail,
+  #rc-nav-handle,
   .rc-pin-layer,
   .rc-pin {
     display: none !important;
@@ -581,6 +769,10 @@ html.rc-armed .rc-commentable:hover {
   html.rc-has-rail body,
   html.rc-has-rail.rc-armed body {
     padding-right: 0 !important;
+  }
+
+  html.rc-has-nav body {
+    padding-left: 0 !important;
   }
 
   /* Clear only the properties this feature sets. background is never
