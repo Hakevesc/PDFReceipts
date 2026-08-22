@@ -273,6 +273,8 @@
     opacity: 1;
   }
 
+  .cat-kind { color: var(--Primary); }
+
   .category-title .cat-count {
     font-size: 12.5px;
     color: var(--On-Surface-Low);
@@ -479,7 +481,7 @@
   <!-- Customer -->
   <div class="category" data-open="true">
     <button class="category-title" type="button" aria-expanded="true" aria-controls="customerList">
-      <span class="cat-name">Merchant | Customer Receipt</span>
+      <span class="cat-name"><span class="cat-kind">Customer</span> Receipt</span>
       <span class="cat-count" id="customerCount"></span>
       <svg class="cat-chevron" viewBox="0 0 24 24" aria-hidden="true"><line class="cat-bar-h" x1="5" y1="12" x2="19" y2="12"/><line class="cat-bar-v" x1="12" y1="5" x2="12" y2="19"/></svg>
     </button>
@@ -489,7 +491,7 @@
   <!-- Business -->
   <div class="category" data-open="false">
     <button class="category-title" type="button" aria-expanded="false" aria-controls="businessList">
-      <span class="cat-name">Merchant | Business Receipt</span>
+      <span class="cat-name"><span class="cat-kind">Business</span> Receipt</span>
       <span class="cat-count" id="businessCount"></span>
       <svg class="cat-chevron" viewBox="0 0 24 24" aria-hidden="true"><line class="cat-bar-h" x1="5" y1="12" x2="19" y2="12"/><line class="cat-bar-v" x1="12" y1="5" x2="12" y2="19"/></svg>
     </button>
