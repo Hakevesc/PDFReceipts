@@ -15,6 +15,7 @@
   --rc-surface: #FFF;
   --rc-surface-alt: #F7F7F8;
   --rc-success: #1FC83B;
+  --rc-on: #16A34A;   /* comment mode active */
 }
 
 /* Make room for the rail without touching any receipt's own body rule.
@@ -54,8 +55,8 @@
 #rc-toggle:hover { border-color: #D5D5DC; color: var(--rc-ink); }
 
 #rc-toggle[data-armed="true"] {
-  background: var(--rc-primary);
-  border-color: var(--rc-primary);
+  background: var(--rc-on);
+  border-color: var(--rc-on);
   color: #FFF;
 }
 
@@ -74,7 +75,7 @@
 }
 
 #rc-toggle[data-armed="true"] .rc-toggle-count {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.28);
 }
 
 #rc-toggle .rc-toggle-count:empty,
@@ -103,7 +104,25 @@
 
 #rc-handle:hover { background: var(--rc-primary-dark); }
 
-html:not(.rc-has-rail) #rc-handle { right: 0; }
+/* Collapsed, it says what it does — an unlabelled arrow on an empty page
+   gives no clue there is a comment panel behind it. */
+.rc-handle-label {
+  display: none;
+  font: 600 12px/1 'Inter', Arial, sans-serif;
+  letter-spacing: 0.2px;
+  color: #FFF;
+  white-space: nowrap;
+}
+
+html:not(.rc-has-rail) #rc-handle {
+  right: 0;
+  width: auto;
+  height: 40px;
+  gap: 7px;
+  padding: 0 14px 0 11px;
+}
+
+html:not(.rc-has-rail) .rc-handle-label { display: inline; }
 
 #rc-handle .rc-chev {
   width: 15px;
@@ -128,11 +147,14 @@ html:not(.rc-has-rail) #rc-handle .rc-chev { transform: rotate(180deg); }
 }
 
 .rc-nav-btn {
+  flex: 1;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
-  padding: 7px 11px;
-  border: 0;
+  height: 36px;                    /* same box as the comment-mode switch */
+  padding: 0 12px;
+  border: 1px solid transparent;
   border-radius: 8px;
   background: var(--rc-primary);
   color: #FFF;

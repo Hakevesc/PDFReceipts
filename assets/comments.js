@@ -708,7 +708,8 @@
     rail.appendChild(head);
     rail.appendChild(railBody);
 
-    handle = el('button', null, chevron('right'));
+    handle = el('button', null,
+      chevron('right') + '<span class="rc-handle-label">Open Comments</span>');
     handle.id = 'rc-handle';
     handle.type = 'button';
     handle.style.position = 'fixed';
