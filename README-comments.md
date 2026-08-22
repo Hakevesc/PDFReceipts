@@ -97,6 +97,29 @@ If the first two both fail, the thread is grouped under **"Field changed"** in t
 and its pin is placed from the coordinates in amber. Feedback is never silently dropped
 or silently mis-attached.
 
+## Who can resolve and delete
+
+**Reply** is open to everyone. **Resolve** and **Delete** are admin-only: they
+show a padlock, and using one prompts for the admin password. Entering it
+correctly unlocks both for that browser from then on.
+
+The default password is **`mpesa-admin`** — change it. The phrase is not stored
+in the source, only its SHA-256 digest, as `adminHash` in `assets/comments.js`.
+To set a new one, run this in any browser console and paste the result:
+
+```js
+crypto.subtle.digest('SHA-256', new TextEncoder().encode('YOUR NEW PHRASE'))
+  .then(b => console.log([...new Uint8Array(b)]
+    .map(x => x.toString(16).padStart(2, '0')).join('')))
+```
+
+Deleting a comment removes its replies too, through the `parent_id` cascade.
+
+**This gates the interface, not the database.** The anon key is public and the
+policies allow deletes, so someone who reads the page source could call the API
+directly. It stops casual resolving and deleting; it is not access control. See
+below for the real fix.
+
 ## Security
 
 The anon key is public by design; access is governed entirely by the RLS policies above,
@@ -115,7 +138,7 @@ To lock it down, either:
 
 | File | Role |
 | --- | --- |
-| `assets/comments.js` | The whole widget — config, Supabase client, rail, pins, anchoring |
+| `assets/comments.js` | The whole widget — config, Supabase client, rail, pins, anchoring, admin gate |
 | `assets/comments.css` | Panel and pin styling, plus the print and small-screen rules |
 | `assets/comments-badges.js` | Homepage only: open-comment count per receipt |
 

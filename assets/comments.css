@@ -83,6 +83,86 @@ html:not(.rc-has-rail) #rc-toggle { right: 16px; }
 #rc-toggle .rc-toggle-count:empty,
 #rc-toggle .rc-toggle-count[data-n="0"] { display: none; }
 
+/* ---------- hide / show handle ---------- */
+
+#rc-handle {
+  position: fixed;
+  top: 16px;
+  right: var(--rc-rail-w);
+  z-index: 1002;
+  width: 26px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px 0 0 8px;
+  background: var(--rc-primary);
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.16);
+  cursor: pointer;
+  transition: right 0.18s ease, background 0.15s ease;
+}
+
+#rc-handle:hover { background: var(--rc-primary-dark); }
+
+html:not(.rc-has-rail) #rc-handle { right: 0; }
+
+#rc-handle .rc-chev {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: #FFF;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.18s ease;
+}
+
+/* points right to tuck the panel away, left to bring it back */
+html:not(.rc-has-rail) #rc-handle .rc-chev { transform: rotate(180deg); }
+
+/* ---------- previous / next ---------- */
+
+.rc-nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.rc-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 11px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--rc-primary);
+  color: #FFF;
+  font: 600 11px/1 'Inter', Arial, sans-serif;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.rc-nav-btn:hover:not([disabled]) { background: var(--rc-primary-dark); }
+
+.rc-nav-btn[disabled] {
+  background: #DCDCE2;
+  color: #8A8A95;
+  cursor: default;
+}
+
+.rc-nav-btn .rc-chev {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 /* ---------- rail ---------- */
 
 #rc-rail {
@@ -435,6 +515,21 @@ html.rc-armed .rc-commentable:hover {
     bottom: 14px;
   }
 
+  #rc-handle, html:not(.rc-has-rail) #rc-handle {
+    top: auto;
+    right: auto;
+    left: 14px;
+    bottom: 14px;
+    width: 40px;
+    height: 26px;
+    border-radius: 8px 8px 0 0;
+  }
+
+  html.rc-has-rail #rc-handle { bottom: calc(55vh + 14px); }
+
+  #rc-handle .rc-chev { transform: rotate(90deg); }
+  html:not(.rc-has-rail) #rc-handle .rc-chev { transform: rotate(-90deg); }
+
   html.rc-has-rail #rc-toggle { bottom: calc(55vh + 14px); }
 }
 
@@ -443,6 +538,7 @@ html.rc-armed .rc-commentable:hover {
 @media print {
   #rc-rail,
   #rc-toggle,
+  #rc-handle,
   .rc-pin-layer,
   .rc-pin {
     display: none !important;

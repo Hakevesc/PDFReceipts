@@ -80,7 +80,12 @@
     notice: null          // transient message shown in the rail
   };
 
-  let page, pinLayer, rail, railBody, toggle;
+  let page, pinLayer, rail, railBody, toggle, handle, nav, prevBtn, nextBtn;
+
+  const chevron = (dir) =>
+    '<svg class="rc-chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="' +
+    (dir === 'left' ? '15 18 9 12 15 6' : '9 18 15 12 9 6') +
+    '"/></svg>';
   let rawRows = [];   // last rows from the server, kept for re-layout on resize
 
   /* --------------------------------------------------------------- helpers */
@@ -195,6 +200,43 @@
 
     // 3. coordinates — always resolvable, flagged so the rail can say so
     return { node: null, orphan: true };
+  }
+
+  /* ------------------------------------------------------ prev / next nav
+     The running order comes from index.html's own receipts array, so the
+     panel walks the list in the same sequence the homepage shows. Disabled
+     entries are skipped because they are not reachable from the homepage
+     either. If the index cannot be read the two buttons simply stay off. */
+
+  async function loadSiblings() {
+    let text;
+    try {
+      const res = await fetch('index.html', { cache: 'no-cache' });
+      if (!res.ok) return;
+      text = await res.text();
+    } catch (_) { return; }
+
+    const list = [];
+    const re = /\{\s*name:\s*'([^']+)',\s*file:\s*'([^']+)'[^}]*\}/g;
+    let m;
+    while ((m = re.exec(text))) {
+      if (/disabled:\s*true/.test(m[0])) continue;
+      list.push({ name: m[1], file: m[2] });
+    }
+
+    const here = list.findIndex((r) => r.file === receipt);
+    if (here === -1) return;
+
+    const wire = (btn, target) => {
+      if (!target) { btn.disabled = true; return; }
+      btn.disabled = false;
+      btn.title = target.name;
+      btn.addEventListener('click', () => {
+        location.href = encodeURIComponent(target.file);
+      });
+    };
+    wire(prevBtn, list[here - 1]);
+    wire(nextBtn, list[here + 1]);
   }
 
   /* ----------------------------------------------------------- admin gate */
@@ -393,8 +435,7 @@
     if (!state.threads.length && !state.pending) {
       railBody.appendChild(el(
         'div', 'rc-empty',
-        'No comments yet.<br>Turn on <b>Comment mode</b> and click any field ' +
-        'on the receipt to leave one.'
+        'No comments yet.<br>Click any field on the receipt to leave one.'
       ));
     }
 
@@ -648,24 +689,41 @@
     rail.id = 'rc-rail';
     rail.style.position = 'fixed';
     const head = el('div', 'rc-rail-head');
+
+    // previous / next receipt, filled in once the index has been read
+    nav = el('div', 'rc-nav');
+    prevBtn = el('button', 'rc-nav-btn', chevron('left') + '<span>Prev</span>');
+    nextBtn = el('button', 'rc-nav-btn', '<span>Next</span>' + chevron('right'));
+    prevBtn.type = nextBtn.type = 'button';
+    prevBtn.disabled = nextBtn.disabled = true;
+    nav.appendChild(prevBtn);
+    nav.appendChild(nextBtn);
+    head.appendChild(nav);
+
     head.appendChild(el('div', 'rc-rail-name', esc(receiptName)));
     head.appendChild(el('div', 'rc-rail-title', 'Comments'));
     head.appendChild(el(
       'div', 'rc-rail-hint',
-      'Turn on <b>Comment mode</b>, then click a field to pin a note. ' +
-      'Printing and PDF export are unaffected.'
+      'Turn on <b>Comment mode</b>, then click a field you want to comment.'
     ));
-    const close = el('button', 'rc-link', 'Hide panel');
-    close.type = 'button';
-    close.style.marginTop = '10px';
-    close.addEventListener('click', () => { arm(false); openRail(false); });
-    head.appendChild(close);
 
     railBody = el('div', 'rc-rail-body');
     rail.appendChild(head);
     rail.appendChild(railBody);
 
+    handle = el('button', null, chevron('right'));
+    handle.id = 'rc-handle';
+    handle.type = 'button';
+    handle.style.position = 'fixed';
+    handle.title = 'Hide or show the comments panel';
+    handle.addEventListener('click', () => {
+      const open = !document.documentElement.classList.contains('rc-has-rail');
+      if (!open) arm(false);
+      openRail(open);
+    });
+
     document.body.appendChild(toggle);
+    document.body.appendChild(handle);
     document.body.appendChild(rail);
 
     // Open by default only when there is room for the page and the rail
@@ -685,6 +743,7 @@
     };
 
     render();
+    loadSiblings();
     connect().then((c) => { if (c) { load(); subscribe(); } else { render(); } });
   }
 
