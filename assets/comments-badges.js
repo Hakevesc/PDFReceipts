@@ -12,8 +12,9 @@
 
   // Keep in step with the CONFIG block in assets/comments.js.
   const CONFIG = {
-    url: '',
-    anonKey: '',
+    url: 'https://gqajqnjjvfdmufodliqc.supabase.co',
+    anonKey:
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxYWpxbmpqdmZkbXVmb2RsaXFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0MDU3NTUsImV4cCI6MjEwMjk4MTc1NX0.k-kUdmD0TQ6RhPkwy3dYf7F825o7rf69n0SGklRViM4',
     table: 'comments',
     clientModule: 'https://esm.sh/@supabase/supabase-js@2'
   };

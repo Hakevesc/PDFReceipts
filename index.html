@@ -90,21 +90,61 @@
 
   .category-title {
     font-family: 'Switzer', sans-serif;
-    font-size: 15px;
+    font-size: 17.5px;
     font-weight: 600;
     color: var(--On-Surface);
     margin-bottom: 12px;
-    padding-left: 4px;
+    padding: 6px 8px 6px 4px;
     display: flex;
     align-items: center;
     gap: 10px;
+    width: 100%;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease;
   }
 
+  .category-title:hover { background: var(--Surface-Container); }
+
+  .category-title:focus-visible {
+    outline: 2px solid var(--Primary);
+    outline-offset: 2px;
+  }
+
+  .cat-chevron {
+    width: 28px;
+    height: 28px;
+    padding: 7px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--Primary);
+    fill: none;
+    stroke: #FFF;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    box-shadow: 0 1px 4px rgba(254, 53, 61, 0.30);
+    transform: rotate(90deg);
+    transition: transform 0.18s ease, background 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .category-title:hover .cat-chevron {
+    background: var(--Primary-Dark);
+    box-shadow: 0 2px 8px rgba(196, 21, 32, 0.38);
+  }
+
+  .category[data-open="false"] .cat-chevron { transform: rotate(0deg); }
+
   .category-title .cat-count {
-    font-size: 12px;
+    font-size: 12.5px;
     color: var(--On-Surface-Low);
     font-weight: 400;
   }
+
+  .category[data-open="false"] .receipt-grid { display: none; }
 
   .receipt-grid {
     display: grid;
@@ -276,7 +316,7 @@
     <div class="header-left">
       <img src="assets/M-PESA-red-logo.svg" alt="M-PESA" class="logo" onerror="this.style.display='none'">
       <div>
-        <h1>PDF Receipts</h1>
+        <h1>M-PESA PDF Receipts</h1>
         <div class="sub">M-PESA transaction receipts & statements</div>
       </div>
     </div>
@@ -284,14 +324,22 @@
   </div>
 
   <!-- Customer -->
-  <div class="category">
-    <div class="category-title">Customer <span class="cat-count" id="customerCount"></span></div>
+  <div class="category" data-open="true">
+    <button class="category-title" type="button" aria-expanded="true" aria-controls="customerList">
+      <svg class="cat-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      <span class="cat-name">Merchant | Customer Receipt</span>
+      <span class="cat-count" id="customerCount"></span>
+    </button>
     <div class="receipt-grid" id="customerList"></div>
   </div>
 
   <!-- Business -->
-  <div class="category">
-    <div class="category-title">Business <span class="cat-count" id="businessCount"></span></div>
+  <div class="category" data-open="true">
+    <button class="category-title" type="button" aria-expanded="true" aria-controls="businessList">
+      <svg class="cat-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      <span class="cat-name">Merchant | Business Receipt</span>
+      <span class="cat-count" id="businessCount"></span>
+    </button>
     <div class="receipt-grid" id="businessList"></div>
   </div>
 
@@ -336,7 +384,7 @@
     { name: 'Distribute Float', file: 'Distribute Float Recipet PDF.html', group: 'business' },
     { name: 'EVD Print', file: 'EVD Receipt Business.html', group: 'business' },
     { name: 'Voucher Via SMS', file: 'Voucher Via SMS business.html', group: 'business' },
-    { name: 'Receive Payment', file: 'Receive Payment Business.html', group: 'business' },
+    { name: 'Request Payment', file: 'Receive Payment Business.html', group: 'business' },
     { name: 'Merchant to Bank', file: 'Merchant to Bank PDF.html', group: 'business' },
     { name: 'Merchant to Merchant Transfer', file: 'Merchant to Merchant Transfer Receipt PDF.html', group: 'business' },
     { name: 'Rollup / Collect Balance (Single Store)', file: 'Rollup Collect Balance Single Store PDF.html', group: 'business' },
@@ -385,10 +433,10 @@
     if (countEl) {
       const live = items.filter(r => !r.disabled).length;
       const off = items.length - live;
-      const notes = [];
-      if (off) notes.push(`${off} disabled`);
-      if (missing.length) notes.push(`${missing.length} not applicable`);
-      countEl.textContent = notes.length ? `(${live} · ${notes.join(' · ')})` : `(${live})`;
+      const parts = [`Total ${items.length}`, `${live} Enabled`];
+      if (off) parts.push(`${off} disabled`);
+      if (missing.length) parts.push(`${missing.length} not applicable`);
+      countEl.textContent = `(${parts.join(', ')})`;
     }
   }
 
@@ -413,7 +461,26 @@
   renderList('customerList', customer, missingCustomer);
   renderList('businessList', business);
 
-  document.getElementById('totalCount').textContent = receipts.filter(r => !r.disabled).length + ' receipts';
+  document.getElementById('totalCount').textContent =
+    receipts.filter(r => !r.disabled).length + ' Merchant receipts';
+
+  // Categories collapse so a long list can be tucked away. The open/closed
+  // choice is remembered between visits.
+  document.querySelectorAll('.category').forEach((cat, i) => {
+    const btn = cat.querySelector('.category-title');
+    const key = 'cat-open-' + i;
+    const saved = localStorage.getItem(key);
+    if (saved !== null) {
+      cat.dataset.open = saved;
+      btn.setAttribute('aria-expanded', saved);
+    }
+    btn.addEventListener('click', () => {
+      const open = cat.dataset.open !== 'true';
+      cat.dataset.open = String(open);
+      btn.setAttribute('aria-expanded', String(open));
+      localStorage.setItem(key, String(open));
+    });
+  });
 </script>
 <script defer src="assets/comments-badges.js"></script>
 </body>
