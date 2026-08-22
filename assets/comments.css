@@ -81,6 +81,27 @@
 #rc-toggle .rc-toggle-count:empty,
 #rc-toggle .rc-toggle-count[data-n="0"] { display: none; }
 
+/* Nothing this feature adds paints until its stylesheet is in, and nothing
+   animates until a frame after that — otherwise every page load shows the
+   rail sliding in from off-screen, which reads as a glitch when stepping
+   through receipts with Prev / Next. */
+#rc-rail,
+#rc-handle,
+#rc-toggle {
+  visibility: hidden;
+}
+
+html.rc-css-ready #rc-rail,
+html.rc-css-ready #rc-handle,
+html.rc-css-ready #rc-toggle {
+  visibility: visible;
+}
+
+html:not(.rc-anim) #rc-rail,
+html:not(.rc-anim) #rc-handle {
+  transition: none !important;
+}
+
 /* ---------- hide / show handle ---------- */
 
 #rc-handle {
@@ -492,13 +513,13 @@ html:not(.rc-has-rail) #rc-rail { transform: translateX(100%); }
    cells carry their own #F5F5F5 fills, and a print-time background reset
    would wipe them out. */
 html.rc-armed .rc-commentable {
-  cursor: url("data:image/svg+xml;utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='28'%20height='28'%20viewBox='0%200%2028%2028'%3E%3Cpath%20d='M6%203.5h16a3.5%203.5%200%200%201%203.5%203.5v10a3.5%203.5%200%200%201-3.5%203.5h-8.2L8%2025.2V20.5H6a3.5%203.5%200%200%201-3.5-3.5V7A3.5%203.5%200%200%201%206%203.5z'%20fill='%23FE353D'%20stroke='%23FFFFFF'%20stroke-width='1.8'/%3E%3Ccircle%20cx='9.5'%20cy='12'%20r='1.6'%20fill='%23FFFFFF'/%3E%3Ccircle%20cx='14'%20cy='12'%20r='1.6'%20fill='%23FFFFFF'/%3E%3Ccircle%20cx='18.5'%20cy='12'%20r='1.6'%20fill='%23FFFFFF'/%3E%3C/svg%3E") 3 3, pointer;
-  outline: 1.5px dashed rgba(254, 53, 61, 0.55);
+  cursor: url("data:image/svg+xml;utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='28'%20height='28'%20viewBox='0%200%2028%2028'%3E%3Cpath%20d='M14%203.2c6.1%200%2011%204.3%2011%209.6s-4.9%209.6-11%209.6c-1%200-2-.1-2.9-.3l-5.6%203.1%201.3-4.6C4.4%2018.9%203%2016.1%203%2012.8%203%207.5%207.9%203.2%2014%203.2z'%20fill='%2316A34A'%20stroke='%23FFFFFF'%20stroke-width='1.8'%20stroke-linejoin='round'/%3E%3Ccircle%20cx='9.6'%20cy='12.8'%20r='1.55'%20fill='%23FFFFFF'/%3E%3Ccircle%20cx='14'%20cy='12.8'%20r='1.55'%20fill='%23FFFFFF'/%3E%3Ccircle%20cx='18.4'%20cy='12.8'%20r='1.55'%20fill='%23FFFFFF'/%3E%3C/svg%3E") 4 4, pointer;
+  outline: 1.5px dashed rgba(22, 163, 74, 0.5);
   outline-offset: 1px;
 }
 
 html.rc-armed .rc-commentable:hover {
-  outline: 2px solid var(--rc-primary);
+  outline: 2px solid var(--rc-on);
   outline-offset: 2px;
 }
 
@@ -508,7 +529,7 @@ html.rc-armed .rc-commentable:hover {
 
 @keyframes rc-flash {
   0%, 100% { outline-color: transparent; }
-  25%, 75% { outline: 2px solid var(--rc-primary); outline-offset: 1px; }
+  25%, 75% { outline: 2px solid var(--rc-on); outline-offset: 1px; }
 }
 
 /* ---------- narrow screens: rail becomes a bottom sheet ---------- */

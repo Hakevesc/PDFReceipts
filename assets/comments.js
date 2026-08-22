@@ -231,6 +231,10 @@
       if (!target) { btn.disabled = true; return; }
       btn.disabled = false;
       btn.title = target.name;
+      const pre = el('link');
+      pre.rel = 'prefetch';
+      pre.href = encodeURIComponent(target.file);
+      document.head.appendChild(pre);
       btn.addEventListener('click', () => {
         location.href = encodeURIComponent(target.file);
       });
@@ -655,9 +659,25 @@
     page = document.querySelector('.page');
     if (!page) return;                    // not a receipt page
 
+    // The rail is built before comments.css can possibly have loaded, so it
+    // would paint unstyled for a frame and then snap into place — the flash
+    // seen when stepping between receipts. Keep the furniture invisible until
+    // the stylesheet is in, then enable transitions one frame later so the
+    // panel does not slide in from off-screen on every page load.
     const link = el('link');
     link.rel = 'stylesheet';
     link.href = 'assets/comments.css';
+    const ready = () => {
+      document.documentElement.classList.add('rc-css-ready');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(
+          () => document.documentElement.classList.add('rc-anim')
+        );
+      });
+    };
+    link.addEventListener('load', ready);
+    link.addEventListener('error', ready);      // never leave the rail hidden
+    setTimeout(ready, 1500);                    // and never wait forever
     document.head.appendChild(link);
 
     document.documentElement.style.setProperty('--rc-rail-w', RAIL_WIDTH + 'px');
