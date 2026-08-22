@@ -40,6 +40,12 @@
     homePage: 'index.html',
     storageKey: 'rc-auth',
 
+    // How many digits the emailed code has. MUST match Supabase:
+    // Authentication -> Sign In / Providers -> Email -> Email OTP Length.
+    // The login page builds that many boxes from this number, so the two
+    // only have to agree here.
+    codeLength: 8,
+
     // The access roster. A row here is what grants access; deleting it in the
     // Supabase Table Editor revokes the person on their next request.
     memberTable: 'members'

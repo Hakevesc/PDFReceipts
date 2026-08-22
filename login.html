@@ -4,8 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign in — M-PESA Receipts</title>
-<link rel="stylesheet" href="assets/auth.css">
-<script src="assets/auth.js" data-login></script>
+<!-- ?v= is a cache buster. Bump it whenever auth.js or auth.css changes, or
+     browsers that already hold a copy will keep running the old one. -->
+<link rel="stylesheet" href="assets/auth.css?v=2">
+<script src="assets/auth.js?v=2" data-login></script>
 </head>
 <body class="rc-login-body">
 
@@ -29,15 +31,10 @@
 
     <!-- Step 2 — six-digit code -->
     <form id="codeStep" novalidate hidden>
-      <p class="rc-sent">We sent a 6-digit code to <b id="sentTo"></b>.<br>It expires in 10 minutes.</p>
-      <div class="rc-code" id="codeBoxes">
-        <input type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Digit 1">
-        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2">
-        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3">
-        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4">
-        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5">
-        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6">
-      </div>
+      <p class="rc-sent">We sent a <span id="codeLen">6</span>-digit code to <b id="sentTo"></b>.<br>It expires in 10 minutes.</p>
+      <!-- Boxes are built from receiptAuth.config.codeLength so the page
+           always matches whatever Supabase is set to send. -->
+      <div class="rc-code" id="codeBoxes"></div>
       <button class="rc-submit" id="codeSubmit" type="submit">Verify and continue</button>
       <div class="rc-alt">
         <button class="rc-textlink" id="backBtn" type="button">Use a different email</button>
@@ -65,9 +62,25 @@
   const resendBtn  = document.getElementById('resendBtn');
   const sentTo     = document.getElementById('sentTo');
   const note       = document.getElementById('note');
-  const boxes      = Array.prototype.slice.call(
-    document.querySelectorAll('#codeBoxes input')
-  );
+
+  // Supabase decides how long the code is; the page follows it rather than
+  // assuming six. Mismatch here is the difference between a code that can be
+  // typed and one that silently cannot.
+  const LEN = (auth && auth.config && auth.config.codeLength) || 6;
+  document.getElementById('codeLen').textContent = String(LEN);
+
+  const codeBoxes = document.getElementById('codeBoxes');
+  const boxes = [];
+  for (var d = 0; d < LEN; d++) {
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.inputMode = 'numeric';
+    input.maxLength = 1;
+    input.setAttribute('aria-label', 'Digit ' + (d + 1));
+    if (d === 0) input.autocomplete = 'one-time-code';
+    codeBoxes.appendChild(input);
+    boxes.push(input);
+  }
 
   let email = '';
   let cooling = 0;
@@ -149,7 +162,7 @@
     clearNote();
 
     const token = boxes.map(function (b) { return b.value.trim(); }).join('');
-    if (token.length !== 6) { say('Enter all six digits.'); return; }
+    if (token.length !== LEN) { say('Enter all ' + LEN + ' digits.'); return; }
 
     codeBtn.disabled = true;
     codeBtn.textContent = 'Verifying…';
@@ -209,7 +222,7 @@
     // Pasting the whole code into any box fills the row.
     box.addEventListener('paste', function (e) {
       const text = (e.clipboardData || window.clipboardData).getData('text') || '';
-      const digits = text.replace(/\D/g, '').slice(0, 6);
+      const digits = text.replace(/\D/g, '').slice(0, LEN);
       if (!digits) return;
       e.preventDefault();
       boxes.forEach(function (b, n) { b.value = digits[n] || ''; });
