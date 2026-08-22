@@ -10,13 +10,10 @@
 (function () {
   'use strict';
 
-  // Keep in step with the CONFIG block in assets/comments.js.
+  // The connection and the session come from assets/auth.js, which index.html
+  // loads first. Only the table name lives here now.
   const CONFIG = {
-    url: 'https://gqajqnjjvfdmufodliqc.supabase.co',
-    anonKey:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxYWpxbmpqdmZkbXVmb2RsaXFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0MDU3NTUsImV4cCI6MjEwMjk4MTc1NX0.k-kUdmD0TQ6RhPkwy3dYf7F825o7rf69n0SGklRViM4',
-    table: 'comments',
-    clientModule: 'https://esm.sh/@supabase/supabase-js@2'
+    table: 'comments'
   };
 
   const CSS = `
@@ -66,13 +63,17 @@
   }
 
   async function run() {
-    if (!CONFIG.url || !CONFIG.anonKey) return;   // not configured: stay silent
+    const auth = window.receiptAuth;
+    if (!auth) return;                            // sign-in not loaded: stay silent
+
+    // No session means no counts — the select policy would return nothing
+    // anyway, so there is no point asking.
+    const who = await auth.ready;
+    if (!who.signedIn) return;
+
     let client;
     try {
-      const mod = await import(CONFIG.clientModule);
-      client = mod.createClient(CONFIG.url, CONFIG.anonKey, {
-        auth: { persistSession: false }
-      });
+      client = await auth.getClient();
     } catch (_) { return; }
 
     const { data, error } = await client

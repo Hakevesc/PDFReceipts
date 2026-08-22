@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M-PESA PDF Receipts</title>
+<title>M-PESA Receipts</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600&display=swap');
-  @import url('https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap');
 
   :root {
     --Primary: #FE353D;
@@ -22,21 +21,22 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Barlow', sans-serif;
     background: #F5F5F5;
     color: var(--On-Surface);
     min-height: 100vh;
-    padding: 30px 20px;
+    padding: 28px 24px;
     display: flex;
     justify-content: center;
     align-items: flex-start;
   }
 
   .container {
-    max-width: 900px;
+    max-width: 1360px;
     width: 100%;
     margin: 0 auto;
   }
+
 
   /* Header */
   .header {
@@ -60,7 +60,7 @@
   }
 
   .header h1 {
-    font-family: 'Switzer', sans-serif;
+    font-family: 'Barlow', sans-serif;
     font-size: 22px;
     font-weight: 700;
     color: var(--On-Surface);
@@ -96,7 +96,7 @@
     border: 1px solid var(--Border);
     border-radius: 8px;
     background: var(--Gray-0);
-    font-family: 'Switzer', sans-serif;
+    font-family: 'Barlow', sans-serif;
     font-size: 13px;
     font-weight: 600;
     color: var(--On-Surface);
@@ -128,7 +128,7 @@
     position: absolute;
     top: calc(100% + 6px);
     right: 0;
-    min-width: 190px;
+    min-width: 240px;
     padding: 5px;
     border: 1px solid var(--Border);
     border-radius: 10px;
@@ -147,10 +147,11 @@
     gap: 10px;
     width: 100%;
     padding: 9px 10px;
+    white-space: nowrap;
     border: 0;
     border-radius: 7px;
     background: none;
-    font-family: 'Switzer', sans-serif;
+    font-family: 'Barlow', sans-serif;
     font-size: 13px;
     font-weight: 500;
     color: var(--On-Surface);
@@ -184,7 +185,7 @@
   .count-badge {
     background: var(--Primary);
     color: #FFF;
-    font-family: 'Switzer', sans-serif;
+    font-family: 'Barlow', sans-serif;
     font-size: 13px;
     font-weight: 600;
     padding: 6px 14px;
@@ -213,7 +214,7 @@
   }
 
   .category-title {
-    font-family: 'Switzer', sans-serif;
+    font-family: 'Barlow', sans-serif;
     font-size: 17.5px;
     font-weight: 600;
     color: var(--On-Surface);
@@ -285,15 +286,20 @@
 
   .receipt-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
+  }
+  /* three across once there is room, so the page fills the window instead of
+     stacking a long list down the middle */
+  @media screen and (min-width: 1180px) {
+    .receipt-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
 
   .receipt-item {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 12px 16px;
+    gap: 11px;
+    padding: 12px 13px;
     background: var(--Gray-0);
     border-radius: 12px;
     text-decoration: none;
@@ -339,7 +345,7 @@
   }
 
   .receipt-name {
-    font-family: 'Switzer', sans-serif;
+    font-family: 'Barlow', sans-serif;
     font-size: 14px;
     font-weight: 600;
     color: var(--On-Surface);
@@ -350,7 +356,7 @@
   }
 
   .receipt-file {
-    font-size: 11px;
+    font-size: 10.5px;
     color: var(--On-Surface-Low);
     font-family: 'SF Mono', Menlo, Consolas, monospace;
     margin-top: 2px;
@@ -403,7 +409,7 @@
 
   .missing-badge,
   .disabled-badge {
-    font-family: 'Switzer', sans-serif;
+    font-family: 'Barlow', sans-serif;
     font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.4px;
@@ -411,7 +417,7 @@
     color: var(--On-Surface-Low);
     background: #E4E4E8;
     border-radius: 4px;
-    padding: 3px 7px;
+    padding: 3px 6px;
     white-space: nowrap;
     flex-shrink: 0;
   }
@@ -421,6 +427,13 @@
   .missing-badge {
     color: var(--Primary-Dark);
     background: #FFE1E3;
+  }
+
+  /* Disabled is flagged in the primary brand red as well, so an unavailable
+     receipt is immediately visible instead of quietly greyed out. */
+  .disabled-badge {
+    color: #FFF;
+    background: var(--Primary);
   }
 
   /* Footer */
@@ -451,6 +464,7 @@
     .receipt-grid { grid-template-columns: 1fr; }
   }
 </style>
+<script src="assets/auth.js"></script>
 </head>
 <body>
 <div class="container">
@@ -461,7 +475,7 @@
       <img src="assets/M-PESA-red-logo.svg" alt="M-PESA" class="logo" onerror="this.style.display='none'">
       <span class="header-divider" aria-hidden="true"></span>
       <div>
-        <h1>M-PESA PDF Receipts</h1>
+        <h1>M-PESA Receipts</h1>
         <div class="sub">Transaction receipts &amp; statements</div>
       </div>
     </div>
@@ -498,7 +512,7 @@
   <!-- Business -->
   <div class="category" data-open="false">
     <button class="category-title" type="button" aria-expanded="false" aria-controls="businessList">
-      <span class="cat-name"><span class="cat-kind">Business</span> Receipt</span>
+      <span class="cat-name"><span class="cat-kind">Merchant</span> Receipt</span>
       <span class="cat-count" id="businessCount"></span>
       <svg class="cat-chevron" viewBox="0 0 24 24" aria-hidden="true"><line class="cat-bar-h" x1="5" y1="12" x2="19" y2="12"/><line class="cat-bar-v" x1="12" y1="5" x2="12" y2="19"/></svg>
     </button>
@@ -508,6 +522,7 @@
 
 </div>
 
+<script src="assets/receipts.js"></script>
 <script>
   // PDF icon SVG
   const pdfIcon = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>';
@@ -515,40 +530,9 @@
   // Arrow SVG
   const arrowSvg = '<svg class="receipt-arrow" viewBox="0 0 24 24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
 
-  const receipts = [
-    // ===== Customer =====
-    { name: 'Agency Banking Cash In', file: 'Agency_Banking_Cashin_Receipt_Customer_Merchant.html', group: 'customer' },
-    { name: 'Agency Banking Cashout', file: 'Agency_Banking_Cashout_Receipt_Customer_Merchant.html', group: 'customer' },
-    { name: 'Cash In', file: 'Cashin_M-PESA_Receipt_Customer_Merchant.html', group: 'customer' },
-    { name: 'Cashout', file: 'Cashout_M-PESA_Receipt_Customer_Merchant.html', group: 'customer' },
-    { name: 'Pay Utility DSTV', file: 'Pay_Utility_DSTV_Receipt_Customer_Merchant.html', group: 'customer', disabled: true },
-    { name: 'Pay Utility EEU', file: 'Pay_Utility_EEU_Receipt_Customer_Merchant.html', group: 'customer' },
-    { name: 'Pay Utility ET', file: 'Pay_Utility_ET_Receipt_Customer_Merchant.html', group: 'customer', disabled: true },
-    { name: 'Pay Utility School', file: 'Pay_Utility_School_Receipt_Customer_Merchant.html', group: 'customer' },
-    { name: 'Pay Utility Water', file: 'Pay_Utility_Water_Receipt_Customer_Merchant.html', group: 'customer' },
-
-    // ===== Business =====
-    { name: 'Agency Banking Cash In', file: 'Agency_Banking_Cashin_Receipt_Business_Merchant.html', group: 'business' },
-    { name: 'Agency Banking Cashout', file: 'Agency_Banking_Cashout_Receipt_Business_Merchant.html', group: 'business' },
-    { name: 'Cash In', file: 'Cashin_Receipt_Business_Merchant.html', group: 'business' },
-    { name: 'Cashout', file: 'Cashout_Receipt_Business_Merchant.html', group: 'business' },
-    { name: 'Pay Utility DSTV', file: 'Pay_Utility_DSTV_Receipt_Business_Merchant.html', group: 'business', disabled: true },
-    { name: 'Pay Utility EEU', file: 'Pay_Utility_EEU_Receipt_Business_Merchant.html', group: 'business' },
-    { name: 'Pay Utility ET', file: 'Pay_Utility_ET_Receipt_Business_Merchant.html', group: 'business', disabled: true },
-    { name: 'Pay Utility School', file: 'Pay_Utility_School_Receipt_Business_Merchant.html', group: 'business' },
-    { name: 'Pay Utility Water', file: 'Pay_Utility_Water_Receipt_Business_Merchant.html', group: 'business' },
-    { name: 'Sell Airtime', file: 'Sell_Airtime_Receipt_Business_Merchant.html', group: 'business' },
-    { name: 'Sell Float', file: 'Sell_Float_Receipt_Business_Merchant.html', group: 'business' },
-    { name: 'Sell Package', file: 'Sell_Package_Receipt_Business_Merchant.html', group: 'business' },
-    { name: 'Distribute Float', file: 'Distribute_Float_Receipt_Business_Merchant.html', group: 'business' },
-    { name: 'EVD Print', file: 'EVD_Receipt_Business_Merchant.html', group: 'business' },
-    { name: 'Voucher Via SMS', file: 'Voucher_Via_SMS_Receipt_Business_Merchant.html', group: 'business' },
-    { name: 'Request Payment', file: 'Receive_Payment_Receipt_Business_Merchant.html', group: 'business' },
-    { name: 'Merchant to Bank', file: 'Merchant_to_Bank_Receipt_Business_Merchant.html', group: 'business' },
-    { name: 'Merchant to Merchant Transfer', file: 'Merchant_to_Merchant_Transfer_Receipt_Business_Merchant.html', group: 'business' },
-    { name: 'Rollup / Collect Balance (Single Store)', file: 'Rollup_Collect_Balance_Single_Store_Receipt_Business_Merchant.html', group: 'business' },
-    { name: 'Rollup / Collect Balance (All Stores)', file: 'Rollup_Collect_Balance_All_Stores_Receipt_Business_Merchant.html', group: 'business' },
-  ];
+  // The list itself lives in assets/receipts.js (shared with the receipt
+  // pages' left sidebar); this page only renders it.
+  const receipts = window.RECEIPTS || [];
 
   function renderList(id, items, missing = []) {
     const el = document.getElementById(id);
@@ -647,21 +631,21 @@
     });
   })();
 
-  // Categories collapse so a long list can be tucked away. The open/closed
-  // choice is remembered between visits.
-  document.querySelectorAll('.category').forEach((cat, i) => {
+  // Categories are an exclusive pair: Customer is open by default and
+  // Merchant stays closed on load; opening one folds the other away.
+  document.querySelectorAll('.category').forEach((cat) => {
     const btn = cat.querySelector('.category-title');
-    const key = 'cat-open-' + i;
-    const saved = localStorage.getItem(key);
-    if (saved !== null) {
-      cat.dataset.open = saved;
-      btn.setAttribute('aria-expanded', saved);
-    }
+    if (!btn) return;
     btn.addEventListener('click', () => {
       const open = cat.dataset.open !== 'true';
+      document.querySelectorAll('.category').forEach((other) => {
+        if (other === cat) return;
+        other.dataset.open = 'false';
+        const ob = other.querySelector('.category-title');
+        if (ob) ob.setAttribute('aria-expanded', 'false');
+      });
       cat.dataset.open = String(open);
       btn.setAttribute('aria-expanded', String(open));
-      localStorage.setItem(key, String(open));
     });
   });
 </script>

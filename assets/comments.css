@@ -5,6 +5,7 @@
    the A4 artwork is never moved, resized or restyled by this file.
    ========================================================================== */
 
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap');
 :root {
   --rc-rail-w: 340px;
   --rc-nav-w: 268px;
@@ -46,7 +47,7 @@
   border: 1px solid var(--rc-border);
   border-radius: 8px;
   background: var(--rc-surface-alt);
-  font: 600 12px/1 'Inter', Arial, sans-serif;
+  font: 600 12px/1 'Barlow', Arial, sans-serif;
   letter-spacing: 0.3px;
   color: var(--rc-ink-low);
   cursor: pointer;
@@ -116,7 +117,7 @@ html:not(.rc-anim) #rc-handle {
   flex-direction: column;
   background: var(--rc-surface);
   border-right: 1px solid var(--rc-border);
-  font-family: 'Inter', Arial, sans-serif;
+  font-family: 'Barlow', Arial, sans-serif;
   color: var(--rc-ink);
   visibility: hidden;
   transform: translateX(0);
@@ -138,10 +139,13 @@ html:not(.rc-has-nav) #rc-nav-rail { transform: translateX(-100%); }
 }
 
 .rc-nav-title {
-  font-family: 'Poppins', 'Inter', sans-serif;
-  font-size: 15px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 19px;
   font-weight: 700;
+  line-height: 1.25;
   letter-spacing: -0.1px;
+  color: var(--rc-ink);
+  word-break: break-word;
 }
 
 .rc-nav-body {
@@ -150,18 +154,25 @@ html:not(.rc-has-nav) #rc-nav-rail { transform: translateX(-100%); }
   padding: 10px 10px 24px;
 }
 
-.rc-nav-sec { margin-bottom: 6px; }
+/* a clearly separated pair: more breathing room between the Customer and
+   Merchant accordions */
+.rc-nav-sec { margin-bottom: 18px; }
+
+.rc-nav-sec:last-child { margin-bottom: 0; }
 
 .rc-nav-sec-head {
   display: flex;
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 9px 10px;
+  padding: 11px 10px;
   border: 0;
   border-radius: 8px;
   background: rgba(254, 53, 61, 0.05);
-  font: 600 12px/1 'Inter', Arial, sans-serif;
+  font-family: 'Barlow', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.25;
   color: var(--rc-ink);
   text-align: left;
   cursor: pointer;
@@ -170,31 +181,44 @@ html:not(.rc-has-nav) #rc-nav-rail { transform: translateX(-100%); }
 
 .rc-nav-sec-head:hover { background: rgba(254, 53, 61, 0.09); }
 
+/* the open (active) tab's title turns brand red so its state reads at a
+   glance — the count follows so the whole header stays legible */
+.rc-nav-sec[data-open="true"] .rc-nav-sec-head {
+  background: rgba(254, 53, 61, 0.09);
+}
+
+.rc-nav-sec[data-open="true"] .rc-nav-sec-head .rc-nav-sec-name,
+.rc-nav-sec[data-open="true"] .rc-nav-sec-head .rc-nav-sec-count {
+  color: var(--rc-primary);
+}
+
 .rc-nav-sec-name { flex: 1; }
 
 .rc-nav-sec-count {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--rc-ink-low);
 }
 
+/* sections point up when open and down when closed; list rows keep the
+   sideways chevron that says "this goes somewhere" */
 .rc-nav-sec-head .rc-chev {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   flex: none;
   fill: none;
   stroke: var(--rc-primary);
   stroke-width: 2.6;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transform: rotate(90deg);
+  transform: rotate(180deg);
   transition: transform 0.18s ease;
 }
 
-.rc-nav-sec[data-open="false"] .rc-chev { transform: rotate(0deg); }
+.rc-nav-sec[data-open="false"] .rc-nav-sec-head .rc-chev { transform: rotate(0deg); }
 .rc-nav-sec[data-open="false"] .rc-nav-list { display: none; }
 
-.rc-nav-list { padding: 4px 0 6px; }
+.rc-nav-list { padding: 8px 0 10px; }
 
 .rc-nav-item {
   display: flex;
@@ -229,12 +253,12 @@ html:not(.rc-has-nav) #rc-nav-rail { transform: translateX(-100%); }
 }
 
 .rc-nav-item.rc-current {
-  background: rgba(254, 53, 61, 0.08);
-  color: var(--rc-primary-dark);
+  background: var(--rc-primary);
+  color: #FFF;
   font-weight: 600;
 }
 
-.rc-nav-item.rc-current .rc-chev { stroke: var(--rc-primary); }
+.rc-nav-item.rc-current .rc-chev { stroke: #FFF; }
 
 /* its handle mirrors the comments one, on the opposite edge */
 #rc-nav-handle {
@@ -315,7 +339,7 @@ html:not(.rc-has-nav) #rc-nav-handle .rc-chev { transform: rotate(180deg); }
    gives no clue there is a comment panel behind it. */
 .rc-handle-label {
   display: none;
-  font: 600 12px/1 'Inter', Arial, sans-serif;
+  font: 600 12px/1 'Barlow', Arial, sans-serif;
   letter-spacing: 0.2px;
   color: #FFF;
   white-space: nowrap;
@@ -365,7 +389,7 @@ html:not(.rc-has-rail) #rc-handle .rc-chev { transform: rotate(180deg); }
   border-radius: 8px;
   background: var(--rc-primary);
   color: #FFF;
-  font: 600 11px/1 'Inter', Arial, sans-serif;
+  font: 600 11px/1 'Barlow', Arial, sans-serif;
   letter-spacing: 0.2px;
   cursor: pointer;
   transition: background 0.15s ease;
@@ -402,7 +426,7 @@ html:not(.rc-has-rail) #rc-handle .rc-chev { transform: rotate(180deg); }
   flex-direction: column;
   background: var(--rc-surface);
   border-left: 1px solid var(--rc-border);
-  font-family: 'Inter', Arial, sans-serif;
+  font-family: 'Barlow', Arial, sans-serif;
   color: var(--rc-ink);
   transform: translateX(0);
   transition: transform 0.18s ease;
@@ -418,7 +442,10 @@ html:not(.rc-has-rail) #rc-rail { transform: translateX(100%); }
 
 /* The receipt this panel belongs to, stated plainly at the top */
 .rc-rail-name {
-  font-family: 'Poppins', 'Inter', sans-serif;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rc-border);
+  font-family: 'Barlow', sans-serif;
   font-size: 19px;
   font-weight: 700;
   line-height: 1.25;
@@ -428,25 +455,14 @@ html:not(.rc-has-rail) #rc-rail { transform: translateX(100%); }
 }
 
 .rc-rail-title {
-  margin-top: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.7px;
-  text-transform: uppercase;
+  margin-top: 14px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.1px;
   color: var(--rc-ink-low);
 }
-
-.rc-rail-hint {
-  margin-top: 10px;
-  padding: 8px 10px;
-  border-radius: 6px;
-  background: var(--rc-surface-alt);
-  font-size: 11px;
-  line-height: 1.5;
-  color: var(--rc-ink-low);
-}
-
-.rc-rail-hint b { color: var(--rc-ink); font-weight: 600; }
 
 .rc-rail-body {
   flex: 1;
@@ -454,12 +470,143 @@ html:not(.rc-has-rail) #rc-rail { transform: translateX(100%); }
   padding: 12px 14px 24px;
 }
 
-.rc-empty {
-  padding: 26px 12px;
-  text-align: center;
-  font-size: 12px;
-  line-height: 1.6;
+/* Who you are posting as. Empty until the session resolves, so it collapses
+   to nothing rather than flashing a placeholder. */
+.rc-rail-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 14px;
+  border-top: 0;
+}
+
+.rc-rail-foot:not(:empty) {
+  padding: 10px 14px;
+  border-top: 1px solid var(--rc-border);
+}
+
+.rc-foot-who {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--rc-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rc-foot-tag {
+  flex: none;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #FFF1F2;
+  color: var(--rc-primary-dark);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.rc-foot-out {
+  flex: none;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--rc-surface-alt);
+  font-family: 'Barlow', Arial, sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
   color: var(--rc-ink-low);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.rc-foot-out:hover { background: #ECECF0; color: var(--rc-ink); }
+
+.rc-empty {
+  padding: 34px 16px;
+  text-align: center;
+  color: var(--rc-ink-low);
+}
+
+.rc-empty-icon {
+  width: 44px;
+  height: 44px;
+  margin-bottom: 12px;
+  fill: none;
+  stroke: #C9C9D2;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rc-empty-title {
+  font-family: 'Barlow', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--rc-ink);
+  margin-bottom: 5px;
+}
+
+.rc-empty-sub {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+/* ---------- the hint tooltip on the switch ---------- */
+
+.rc-toggle-wrap {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.rc-toggle-wrap #rc-toggle { margin-bottom: 0; }
+
+.rc-tip {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 10px);
+  left: auto;
+  width: max-content;
+  max-width: 240px;
+  z-index: 3;
+  padding: 9px 11px;
+  border-radius: 8px;
+  background: var(--rc-ink);
+  color: #FFF;
+  font-size: 11.5px;
+  line-height: 1.45;
+  text-align: left;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.20);
+  opacity: 0;
+  transform: translate(-6px, -50%);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.rc-tip b { font-weight: 700; }
+
+/* the little triangle sits on the tooltip's right edge, pointing at the
+   comment-mode switch it belongs to */
+.rc-tip::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -5px;
+  margin-top: -5px;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid var(--rc-ink);
+}
+
+.rc-tip.rc-tip-on {
+  opacity: 1;
+  transform: translate(0, -50%);
 }
 
 .rc-status {
@@ -583,22 +730,21 @@ html:not(.rc-has-rail) #rc-rail { transform: translateX(100%); }
   border: 0;
   background: none;
   padding: 0;
-  font: 600 11px/1 'Inter', Arial, sans-serif;
+  font: 600 11px/1 'Barlow', Arial, sans-serif;
   color: var(--rc-ink-low);
   cursor: pointer;
 }
 
 .rc-link:hover { color: var(--rc-primary); }
+/* Resolve is a positive action — green. Delete is destructive — red. Both
+   carry their colour at rest so the choices read clearly, not just on hover. */
+.rc-link.rc-done { color: var(--rc-success); }
+.rc-link.rc-del { color: var(--rc-primary-dark); }
 .rc-link.rc-done:hover { color: var(--rc-success); }
 .rc-link.rc-del:hover { color: var(--rc-primary-dark); }
 
-/* Admin-only actions carry a small padlock until the passphrase is entered */
-.rc-link.rc-locked { opacity: 0.55; }
-
-.rc-link.rc-locked::after {
-  content: " F512";
-  font-size: 9px;
-}
+/* Admin-only actions still prompt for the passphrase when clicked; the
+   padlock glyph has been dropped by request. */
 
 .rc-thread-foot .rc-del { margin-left: auto; }
 
@@ -617,7 +763,7 @@ html:not(.rc-has-rail) #rc-rail { transform: translateX(100%); }
   padding: 8px 9px;
   border: 1px solid var(--rc-border);
   border-radius: 6px;
-  font: 400 12px/1.5 'Inter', Arial, sans-serif;
+  font: 400 12px/1.5 'Barlow', Arial, sans-serif;
   color: var(--rc-ink);
   resize: vertical;
 }
@@ -644,7 +790,7 @@ html:not(.rc-has-rail) #rc-rail { transform: translateX(100%); }
   border-radius: 6px;
   background: var(--rc-primary);
   color: #FFF;
-  font: 600 11px/1 'Inter', Arial, sans-serif;
+  font: 600 11px/1 'Barlow', Arial, sans-serif;
   cursor: pointer;
 }
 
@@ -680,7 +826,7 @@ html:not(.rc-has-rail) #rc-rail { transform: translateX(100%); }
   background: var(--rc-primary);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28);
   color: #FFF;
-  font: 700 11px/19px 'Inter', Arial, sans-serif;
+  font: 700 11px/19px 'Barlow', Arial, sans-serif;
   text-align: center;
   cursor: pointer;
   pointer-events: auto;

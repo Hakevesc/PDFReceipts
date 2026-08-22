@@ -14,29 +14,10 @@
 
   /* ---------------------------------------------------------------- config */
 
+  // The connection and the identity both come from assets/auth.js, which
+  // every receipt loads first. Only the table name lives here now.
   const CONFIG = {
-    // Fill these in from your Supabase project: Settings → API.
-    // The anon key is meant to be public; access is governed by the RLS
-    // policies on the comments table (see README-comments.md).
-    url: 'https://gqajqnjjvfdmufodliqc.supabase.co',
-    anonKey:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxYWpxbmpqdmZkbXVmb2RsaXFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0MDU3NTUsImV4cCI6MjEwMjk4MTc1NX0.k-kUdmD0TQ6RhPkwy3dYf7F825o7rf69n0SGklRViM4',
-    table: 'comments',
-    clientModule: 'https://esm.sh/@supabase/supabase-js@2',
-
-    // Resolve and Delete are reserved for whoever holds this passphrase.
-    // Stored as a SHA-256 digest so the phrase itself is not in the source.
-    // To change it, run in any browser console:
-    //   crypto.subtle.digest('SHA-256', new TextEncoder().encode('NEW PHRASE'))
-    //     .then(b => console.log([...new Uint8Array(b)]
-    //       .map(x => x.toString(16).padStart(2, '0')).join('')))
-    // and paste the result here.
-    //
-    // This gates the UI, not the database: the anon key is public, so a
-    // determined visitor could still call the API directly. It stops casual
-    // resolving and deleting, nothing more. Real enforcement needs Supabase
-    // Auth with policies keyed to an authenticated role.
-    adminHash: '285c8a142b1a2fbcb4eca3f4f7c7fa7f70667bc06417f3643e3c9b32bd29c32a'
+    table: 'comments'
   };
 
   const RAIL_WIDTH = 340;
@@ -75,22 +56,28 @@
     threads: [],          // [{root, replies:[], anchor:{...}, el, pin, n}]
     armed: false,
     railOpen: true,
-    author: localStorage.getItem('rc-author') || '',
+    author: '',           // display name, derived from the signed-in email
+    email: '',
     activeId: null,
     supabase: null,
     error: null,
     pending: null,        // anchor awaiting its first comment
-    admin: localStorage.getItem('rc-admin') === '1',
+    admin: false,         // mirrors the admins table; the policies re-check it
     notice: null          // transient message shown in the rail
   };
 
-  let page, pinLayer, rail, railBody, toggle, handle, nav, prevBtn, nextBtn;
-  let navRail, navHandle;
+  let page, pinLayer, rail, railBody, railFoot, toggle, handle, nav, prevBtn, nextBtn;
+  let navRail, navHandle, tip, tipTimer, tipCycle;
+
+  const CHEV = {
+    left: '15 18 9 12 15 6',
+    right: '9 18 15 12 9 6',
+    down: '6 9 12 15 18 9'
+  };
 
   const chevron = (dir) =>
     '<svg class="rc-chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="' +
-    (dir === 'left' ? '15 18 9 12 15 6' : '9 18 15 12 9 6') +
-    '"/></svg>';
+    (CHEV[dir] || CHEV.right) + '"/></svg>';
   let rawRows = [];   // last rows from the server, kept for re-layout on resize
 
   /* --------------------------------------------------------------- helpers */
@@ -207,6 +194,36 @@
     return { node: null, orphan: true };
   }
 
+  /* ----------------------------------------------------------- the hint
+     Shown on the switch rather than parked in the panel: a line of standing
+     instructions gets read once and then becomes furniture. It surfaces on
+     hover, and on its own every so often until comment mode has been used. */
+
+  function showTip(on) {
+    if (!tip) return;
+    if (on && state.armed) return;               // nothing to explain mid-use
+    tip.classList.toggle('rc-tip-on', on);
+  }
+
+  function startTipCycle() {
+    if (localStorage.getItem('rc-tip-done') === '1') return;
+    const pulse = () => {
+      if (state.armed) return;
+      showTip(true);
+      tipTimer = setTimeout(() => { showTip(false); tipTimer = null; }, 5000);
+    };
+    setTimeout(pulse, 2500);
+    tipCycle = setInterval(pulse, 30000);
+  }
+
+  function stopTipCycle() {
+    clearInterval(tipCycle);
+    clearTimeout(tipTimer);
+    tipTimer = null;
+    showTip(false);
+    localStorage.setItem('rc-tip-done', '1');
+  }
+
   /* ------------------------------------------------------ left nav sidebar
      A copy of the homepage list, so a reviewer can walk the whole set
      without going back to the index. Built from the same parsed array as
@@ -221,54 +238,71 @@
     navRail.style.position = 'fixed';
 
     const head = el('div', 'rc-nav-head');
-    head.appendChild(el('div', 'rc-nav-title', 'Merchant Receipts'));
+    head.appendChild(el('div', 'rc-nav-title', 'Merchant Lite App Receipts'));
     navRail.appendChild(head);
 
     const body = el('div', 'rc-nav-body');
 
-    [['customer', 'Customer Receipts'], ['business', 'Business Receipts']]
-      .forEach(([group, label], i) => {
-        const items = list.filter((r) => r.group === group);
-        if (!items.length) return;
+    // Exclusive accordion: only one section is open at a time. Opening one
+    // folds the other away, and the state of the open section is remembered.
+    const here = list.find((r) => r.file === receipt);
+    const savedOpen = ['customer', 'business']
+      .find((g) => localStorage.getItem('rc-nav-open-' + g) === 'true');
+    const openGroup = here ? here.group : (savedOpen || 'customer');
 
-        const sec = el('div', 'rc-nav-sec');
-        const key = 'rc-nav-open-' + group;
-        const holdsCurrent = items.some((r) => r.file === receipt);
-        const saved = localStorage.getItem(key);
-        // default open on the section holding the receipt being viewed
-        sec.dataset.open = saved !== null ? saved : String(holdsCurrent || i === 0);
+    const groups = [['customer', 'Customer'], ['business', 'Merchant']];
+    groups.forEach(([group, label]) => {
+      const items = list.filter((r) => r.group === group);
+      if (!items.length) return;
 
-        const btn = el('button', 'rc-nav-sec-head');
-        btn.type = 'button';
-        btn.innerHTML =
-          '<span class="rc-nav-sec-name">' + esc(label) + '</span>' +
-          '<span class="rc-nav-sec-count">' + items.length + '</span>' +
-          chevron('right');
-        btn.setAttribute('aria-expanded', sec.dataset.open);
-        btn.addEventListener('click', () => {
-          const open = sec.dataset.open !== 'true';
-          sec.dataset.open = String(open);
-          btn.setAttribute('aria-expanded', String(open));
-          localStorage.setItem(key, String(open));
-        });
-        sec.appendChild(btn);
+      const sec = el('div', 'rc-nav-sec');
+      sec.dataset.group = group;
+      const key = 'rc-nav-open-' + group;
+      sec.dataset.open = String(group === openGroup);
+
+      const btn = el('button', 'rc-nav-sec-head');
+      btn.type = 'button';
+      btn.innerHTML =
+        '<span class="rc-nav-sec-name">' + esc(label) + '</span>' +
+        '<span class="rc-nav-sec-count">' + items.length + '</span>' +
+        chevron('down');
+      btn.setAttribute('aria-expanded', sec.dataset.open);
+      btn.addEventListener('click', () => {
+        const open = sec.dataset.open !== 'true';
+        // one at a time: opening a section folds the other away
+        if (open) {
+          navRail.querySelectorAll('.rc-nav-sec').forEach((other) => {
+            if (other === sec) return;
+            other.dataset.open = 'false';
+            const ob = other.querySelector('.rc-nav-sec-head');
+            if (ob) ob.setAttribute('aria-expanded', 'false');
+            if (other.dataset.group) {
+              localStorage.setItem('rc-nav-open-' + other.dataset.group, 'false');
+            }
+          });
+        }
+        sec.dataset.open = String(open);
+        btn.setAttribute('aria-expanded', String(open));
+        localStorage.setItem(key, String(open));
+      });
+      sec.appendChild(btn);
 
         const ul = el('div', 'rc-nav-list');
-        items.forEach((r) => {
-          const a = el('a', 'rc-nav-item');
-          a.href = encodeURIComponent(r.file);
-          a.title = r.file;
-          if (r.file === receipt) {
-            a.classList.add('rc-current');
-            a.setAttribute('aria-current', 'page');
-          }
-          a.innerHTML = '<span class="rc-nav-item-name">' + esc(r.name) + '</span>' +
-                        chevron('right');
-          ul.appendChild(a);
-        });
-        sec.appendChild(ul);
-        body.appendChild(sec);
+      items.forEach((r) => {
+        const a = el('a', 'rc-nav-item');
+        a.href = encodeURIComponent(r.file);
+        a.title = r.file;
+        if (r.file === receipt) {
+          a.classList.add('rc-current');
+          a.setAttribute('aria-current', 'page');
+        }
+        a.innerHTML = '<span class="rc-nav-item-name">' + esc(r.name) + '</span>' +
+                      chevron('right');
+        ul.appendChild(a);
       });
+      sec.appendChild(ul);
+      body.appendChild(sec);
+    });
 
     navRail.appendChild(body);
 
@@ -303,21 +337,46 @@
      entries are skipped because they are not reachable from the homepage
      either. If the index cannot be read the two buttons simply stay off. */
 
-  async function loadSiblings() {
-    let text;
-    try {
-      const res = await fetch('index.html', { cache: 'no-cache' });
-      if (!res.ok) return;
-      text = await res.text();
-    } catch (_) { return; }
+  // The list used to come from a live fetch of index.html, which browsers
+  // block when a receipt is opened straight from disk (file://). The
+  // canonical list now lives in assets/receipts.js as a plain <script> —
+  // loadable from file:// as well as http — so prefer it and keep the
+  // fetch only as a fallback for deployments that predate the file.
+  function receiptList() {
+    return new Promise((resolve) => {
+      if (Array.isArray(window.RECEIPTS)) { resolve(window.RECEIPTS); return; }
+      const script = el('script');
+      script.src = 'assets/receipts.js';
+      script.onload = () => resolve(
+        Array.isArray(window.RECEIPTS) ? window.RECEIPTS : null
+      );
+      script.onerror = () => resolve(null);
+      document.head.appendChild(script);
+    });
+  }
 
-    const list = [];
-    const re = /\{\s*name:\s*'([^']+)',\s*file:\s*'([^']+)',\s*group:\s*'(\w+)'[^}]*\}/g;
-    let m;
-    while ((m = re.exec(text))) {
-      if (/disabled:\s*true/.test(m[0])) continue;
-      list.push({ name: m[1], file: m[2], group: m[3] });
+  async function loadSiblings() {
+    let list = (await receiptList()) || [];
+
+    if (!list.length) {
+      // Old deployment without assets/receipts.js: read the homepage's
+      // inline array the way the feature originally did.
+      let text;
+      try {
+        const res = await fetch('index.html', { cache: 'no-cache' });
+        if (!res.ok) return;
+        text = await res.text();
+      } catch (_) { return; }
+      const re = /\{\s*name:\s*'([^']+)',\s*file:\s*'([^']+)',\s*group:\s*'(\w+)'[^}]*\}/g;
+      let m;
+      while ((m = re.exec(text))) {
+        if (/disabled:\s*true/.test(m[0])) continue;
+        list.push({ name: m[1], file: m[2], group: m[3] });
+      }
     }
+
+    list = list.filter((r) => r && !r.disabled);
+    if (!list.length) return;
 
     buildNavRail(list);
 
@@ -340,15 +399,7 @@
     wire(nextBtn, list[here + 1]);
   }
 
-  /* ----------------------------------------------------------- admin gate */
-
-  async function sha256(text) {
-    const buf = await crypto.subtle.digest(
-      'SHA-256', new TextEncoder().encode(text)
-    );
-    return [...new Uint8Array(buf)]
-      .map((b) => b.toString(16).padStart(2, '0')).join('');
-  }
+  /* --------------------------------------------------------------- notices */
 
   function flash(msg) {
     state.notice = msg;
@@ -357,38 +408,35 @@
     flash.t = setTimeout(() => { state.notice = null; render(); }, 4000);
   }
 
-  // Asks once, then remembers. Returns true when the visitor is an admin.
-  async function requireAdmin(action) {
-    if (state.admin) return true;
-    const NL = String.fromCharCode(10);
-    const entry = window.prompt(
-      'Admin only task.' + NL + NL +
-      '"' + action + '" is reserved for admins.' + NL +
-      'Enter the admin password to continue:'
-    );
-    if (entry === null) return false;               // cancelled
-    const ok = (await sha256(entry.trim())) === CONFIG.adminHash;
-    if (!ok) { flash('That password is not right — nothing was changed.'); return false; }
-    state.admin = true;
-    localStorage.setItem('rc-admin', '1');
-    flash('Admin unlocked. You can resolve and delete comments on this browser.');
-    return true;
-  }
+  /* -------------------------------------------------------------- supabase
 
-  /* -------------------------------------------------------------- supabase */
+     assets/auth.js owns the client and the session. By the time its ready
+     promise settles the visitor is either signed in or already being sent to
+     login.html, so there is no anonymous path through here. */
 
   async function connect() {
-    if (!CONFIG.url || !CONFIG.anonKey) {
+    const auth = window.receiptAuth;
+    if (!auth) {
       state.error =
-        'Not connected yet. Add your Supabase URL and anon key at the top of ' +
-        'assets/comments.js to start collecting comments.';
+        'Sign-in is not loaded. Add <script src="assets/auth.js"></script> to ' +
+        'the head of this receipt.';
       return null;
     }
+
+    await auth.ready;
+
+    if (!auth.signedIn) {
+      state.error = auth.error ||
+        'Not signed in — comments are hidden until you sign in.';
+      return null;
+    }
+
+    state.author = auth.displayName;
+    state.email = auth.email;
+    state.admin = auth.isAdmin;
+
     try {
-      const mod = await import(CONFIG.clientModule);
-      state.supabase = mod.createClient(CONFIG.url, CONFIG.anonKey, {
-        auth: { persistSession: false }
-      });
+      state.supabase = await auth.getClient();
       return state.supabase;
     } catch (e) {
       state.error = 'Could not reach Supabase: ' + (e && e.message ? e.message : e);
@@ -536,7 +584,12 @@
     if (!state.threads.length && !state.pending) {
       railBody.appendChild(el(
         'div', 'rc-empty',
-        'No comments yet.<br>Click any field on the receipt to leave one.'
+        '<svg class="rc-empty-icon" viewBox="0 0 48 48" aria-hidden="true">' +
+        '<path d="M9 10.5h30a4.5 4.5 0 0 1 4.5 4.5v15a4.5 4.5 0 0 1-4.5 4.5H22.8' +
+        'L13.5 41v-6.5H9A4.5 4.5 0 0 1 4.5 30V15A4.5 4.5 0 0 1 9 10.5z"/>' +
+        '<line x1="8" y1="41.5" x2="40" y2="7.5"/></svg>' +
+        '<div class="rc-empty-title">No comments yet.</div>' +
+        '<div class="rc-empty-sub">Click any field on the receipt to leave one.</div>'
       ));
     }
 
@@ -552,7 +605,30 @@
     badge.textContent = open ? String(open) : '';
     badge.setAttribute('data-n', String(open));
 
+    renderFoot();
     drawPins();
+  }
+
+  // Who you are posting as, at the bottom of the rail. The homepage shows the
+  // same thing as a chip in its header (see mountChip in assets/auth.js).
+  function renderFoot() {
+    if (!railFoot) return;
+    railFoot.textContent = '';
+    if (!state.author) return;
+
+    const who = el('span', 'rc-foot-who',
+      esc(state.author) +
+      (state.admin ? '<span class="rc-foot-tag">admin</span>' : ''));
+    who.title = state.email;
+
+    const out = el('button', 'rc-foot-out', 'Sign out');
+    out.type = 'button';
+    out.addEventListener('click', () => {
+      if (window.receiptAuth) window.receiptAuth.signOut();
+    });
+
+    railFoot.appendChild(who);
+    railFoot.appendChild(out);
   }
 
   function threadCard(t) {
@@ -591,29 +667,31 @@
       card.appendChild(composer(null, t.root.id));
       card.querySelector('textarea').focus();
     });
-    const label = t.root.resolved ? 'Reopen' : 'Resolve';
-    const done = el('button', 'rc-link rc-done', label);
-    done.type = 'button';
-    if (!state.admin) done.classList.add('rc-locked');
-    done.addEventListener('click', async () => {
-      if (await requireAdmin(label)) toggleResolved(t.root);
-    });
-
-    const del = el('button', 'rc-link rc-del', 'Delete');
-    del.type = 'button';
-    if (!state.admin) del.classList.add('rc-locked');
-    del.addEventListener('click', async () => {
-      if (!(await requireAdmin('Delete'))) return;
-      const n = t.replies.length;
-      const msg = n
-        ? 'Delete this comment and its ' + n + (n === 1 ? ' reply?' : ' replies?')
-        : 'Delete this comment?';
-      if (window.confirm(msg)) removeThread(t.root);
-    });
-
     foot.appendChild(reply);
-    foot.appendChild(done);
-    foot.appendChild(del);
+
+    // Resolve and Delete belong to the admins listed in the database. Others
+    // never see the buttons — and could not use them anyway, since the update
+    // and delete policies check the same table.
+    if (state.admin) {
+      const label = t.root.resolved ? 'Reopen' : 'Resolve';
+      const done = el('button', 'rc-link rc-done', label);
+      done.type = 'button';
+      done.addEventListener('click', () => toggleResolved(t.root));
+
+      const del = el('button', 'rc-link rc-del', 'Delete');
+      del.type = 'button';
+      del.addEventListener('click', () => {
+        const n = t.replies.length;
+        const msg = n
+          ? 'Delete this comment and its ' + n + (n === 1 ? ' reply?' : ' replies?')
+          : 'Delete this comment?';
+        if (window.confirm(msg)) removeThread(t.root);
+      });
+
+      foot.appendChild(done);
+      foot.appendChild(del);
+    }
+
     card.appendChild(foot);
 
     return card;
@@ -652,7 +730,7 @@
     const row = el('div', 'rc-composer-row');
     row.appendChild(el(
       'span', 'rc-composer-who',
-      state.author ? 'as ' + esc(state.author) : 'you will be asked for a name'
+      state.author ? 'as ' + esc(state.author) : 'not signed in'
     ));
 
     const actions = el('div');
@@ -670,12 +748,25 @@
     send.addEventListener('click', async () => {
       const body = ta.value.trim();
       if (!body) return;
-      const author = askAuthor();
-      if (!author) return;
+      const auth = window.receiptAuth;
+      if (!auth || !auth.signedIn) {
+        flash('You are not signed in — this comment was not saved.');
+        return;
+      }
       send.disabled = true;
 
+      // user_id and author_email are not decoration: the insert policy
+      // requires both to match the signed-in session, so a forged author
+      // is rejected by Postgres rather than trusted.
       const row2 = Object.assign(
-        { receipt, author, body, parent_id: parentId || null },
+        {
+          receipt,
+          author: auth.displayName,
+          author_email: auth.email,
+          user_id: auth.user.id,
+          body,
+          parent_id: parentId || null
+        },
         anchor || {}
       );
       const saved = await insert(row2);
@@ -700,18 +791,10 @@
     return box;
   }
 
-  function askAuthor() {
-    if (state.author) return state.author;
-    const name = (window.prompt('Your name (shown on your comments):') || '').trim();
-    if (!name) return null;
-    state.author = name;
-    localStorage.setItem('rc-author', name);
-    return name;
-  }
-
   /* ------------------------------------------------------------ comment mode */
 
   function arm(on) {
+    if (on) stopTipCycle();
     state.armed = on;
     document.documentElement.classList.toggle('rc-armed', on);
     toggle.setAttribute('data-armed', String(on));
@@ -798,11 +881,24 @@
     // in-flow rail would squeeze the A4 page — including in print.
     toggle.addEventListener('click', () => arm(!state.armed));
 
+    tip = el('div', 'rc-tip',
+      'Turn on <b>Comment Mode</b>, then click a field you want to comment.');
+    tip.setAttribute('role', 'tooltip');
+
+    toggle.addEventListener('mouseenter', () => showTip(true));
+    toggle.addEventListener('mouseleave', () => { if (!tipTimer) showTip(false); });
+
     rail = el('aside');
     rail.id = 'rc-rail';
     rail.style.position = 'fixed';
     const head = el('div', 'rc-rail-head');
-    head.appendChild(toggle);
+    // The receipt this panel belongs to, stated first as the big title.
+    head.appendChild(el('div', 'rc-rail-name', esc(receiptName)));
+
+    const toggleWrap = el('div', 'rc-toggle-wrap');
+    toggleWrap.appendChild(toggle);
+    toggleWrap.appendChild(tip);
+    head.appendChild(toggleWrap);
 
     // previous / next receipt, filled in once the index has been read
     nav = el('div', 'rc-nav');
@@ -814,16 +910,14 @@
     nav.appendChild(nextBtn);
     head.appendChild(nav);
 
-    head.appendChild(el('div', 'rc-rail-name', esc(receiptName)));
+    // The big "Comments" heading, sitting below the navigations.
     head.appendChild(el('div', 'rc-rail-title', 'Comments'));
-    head.appendChild(el(
-      'div', 'rc-rail-hint',
-      'Turn on <b>Comment mode</b>, then click a field you want to comment.'
-    ));
 
     railBody = el('div', 'rc-rail-body');
+    railFoot = el('div', 'rc-rail-foot');
     rail.appendChild(head);
     rail.appendChild(railBody);
+    rail.appendChild(railFoot);
 
     handle = el('button', null,
       chevron('right') + '<span class="rc-handle-label">Open Comments</span>');
@@ -857,6 +951,7 @@
     };
 
     render();
+    startTipCycle();
     loadSiblings();
     connect().then((c) => { if (c) { load(); subscribe(); } else { render(); } });
   }

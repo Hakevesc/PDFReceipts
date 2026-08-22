@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in — M-PESA Receipts</title>
+<link rel="stylesheet" href="assets/auth.css">
+<script src="assets/auth.js" data-login></script>
+</head>
+<body class="rc-login-body">
+
+<main class="rc-login">
+  <img src="assets/M-PESA-red-logo.svg" alt="M-PESA" class="rc-login-logo"
+       onerror="this.style.display='none'">
+
+  <h1>Review the receipts</h1>
+  <p class="rc-login-sub">Sign in with your Safaricom email</p>
+
+  <div class="rc-card">
+
+    <!-- Step 1 — email -->
+    <form id="emailStep" novalidate>
+      <input class="rc-field" id="email" type="email" name="email"
+             placeholder="Enter your Safaricom email address" autocomplete="email"
+             autocapitalize="off" spellcheck="false" required>
+      <button class="rc-submit" id="emailSubmit" type="submit">Continue with email</button>
+      <p class="rc-fine">Safaricom addresses only. No password — we email you a code.</p>
+    </form>
+
+    <!-- Step 2 — six-digit code -->
+    <form id="codeStep" novalidate hidden>
+      <p class="rc-sent">We sent a 6-digit code to <b id="sentTo"></b>.<br>It expires in 10 minutes.</p>
+      <div class="rc-code" id="codeBoxes">
+        <input type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Digit 1">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6">
+      </div>
+      <button class="rc-submit" id="codeSubmit" type="submit">Verify and continue</button>
+      <div class="rc-alt">
+        <button class="rc-textlink" id="backBtn" type="button">Use a different email</button>
+        <button class="rc-textlink" id="resendBtn" type="button">Resend code</button>
+      </div>
+    </form>
+
+    <div class="rc-note" id="note" role="status" hidden></div>
+  </div>
+
+  <p class="rc-login-foot">M-PESA receipt review · internal</p>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  const auth       = window.receiptAuth;
+  const emailStep  = document.getElementById('emailStep');
+  const codeStep   = document.getElementById('codeStep');
+  const emailInput = document.getElementById('email');
+  const emailBtn   = document.getElementById('emailSubmit');
+  const codeBtn    = document.getElementById('codeSubmit');
+  const backBtn    = document.getElementById('backBtn');
+  const resendBtn  = document.getElementById('resendBtn');
+  const sentTo     = document.getElementById('sentTo');
+  const note       = document.getElementById('note');
+  const boxes      = Array.prototype.slice.call(
+    document.querySelectorAll('#codeBoxes input')
+  );
+
+  let email = '';
+  let cooling = 0;
+  let coolTimer = null;
+
+  /* ------------------------------------------------------------- notices */
+
+  function say(text, kind) {
+    note.textContent = text;
+    note.className = 'rc-note ' + (kind === 'ok' ? 'is-ok' : 'is-error');
+    note.hidden = false;
+  }
+
+  function clearNote() { note.hidden = true; }
+
+  /* ------------------------------------------------------------ where to */
+
+  // Only ever a bare filename from this origin — safeNext() drops anything
+  // with a slash, scheme or host, so ?next= cannot bounce you off-site.
+  function destination() {
+    const raw = new URLSearchParams(location.search).get('next');
+    return (auth && auth.safeNext(raw)) || 'index.html';
+  }
+
+  /* -------------------------------------------------------------- step 1 */
+
+  emailStep.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    clearNote();
+
+    const value = emailInput.value.trim().toLowerCase();
+    if (!value) { say('Enter your email address.'); emailInput.focus(); return; }
+
+    // Checked here as well as in Postgres, purely so a wrong-domain address
+    // never burns an email or a rate-limit slot.
+    if (!auth.isAllowedEmail(value)) {
+      say('Use your Safaricom email address — it must end in @safaricom.et.');
+      emailInput.focus();
+      return;
+    }
+
+    emailBtn.disabled = true;
+    emailBtn.textContent = 'Sending…';
+
+    const sent = await sendCode(value);
+
+    emailBtn.disabled = false;
+    emailBtn.textContent = 'Continue with email';
+    if (!sent) return;
+
+    email = value;
+    sentTo.textContent = value;
+    emailStep.hidden = true;
+    codeStep.hidden = false;
+    say('Code sent. Check your inbox, and your spam folder.', 'ok');
+    startCooldown();
+    boxes[0].focus();
+  });
+
+  async function sendCode(address) {
+    try {
+      const client = await auth.getClient();
+      const { error } = await client.auth.signInWithOtp({
+        email: address,
+        options: { shouldCreateUser: true }
+      });
+      if (error) { say(friendly(error)); return false; }
+      return true;
+    } catch (err) {
+      say('Could not reach the sign-in service. Check your connection and try again.');
+      return false;
+    }
+  }
+
+  /* -------------------------------------------------------------- step 2 */
+
+  codeStep.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    clearNote();
+
+    const token = boxes.map(function (b) { return b.value.trim(); }).join('');
+    if (token.length !== 6) { say('Enter all six digits.'); return; }
+
+    codeBtn.disabled = true;
+    codeBtn.textContent = 'Verifying…';
+
+    try {
+      const client = await auth.getClient();
+
+      // A first-time address gets Supabase's "Confirm signup" mail, an
+      // existing one gets "Magic Link". The generic 'email' type covers both
+      // on current supabase-js, but fall back to 'signup' so a brand-new
+      // reviewer is never stuck on their very first code.
+      let { data, error } = await client.auth.verifyOtp({
+        email: email, token: token, type: 'email'
+      });
+      if (error && !(data && data.session)) {
+        const retry = await client.auth.verifyOtp({
+          email: email, token: token, type: 'signup'
+        });
+        if (retry.data && retry.data.session) { data = retry.data; error = null; }
+      }
+
+      if (error || !data || !data.session) {
+        codeBtn.disabled = false;
+        codeBtn.textContent = 'Verify and continue';
+        say(error ? friendly(error) : 'That code did not work. Try again.');
+        boxes.forEach(function (b) { b.value = ''; });
+        boxes[0].focus();
+        return;
+      }
+      location.replace(destination());
+    } catch (err) {
+      codeBtn.disabled = false;
+      codeBtn.textContent = 'Verify and continue';
+      say('Could not reach the sign-in service. Check your connection and try again.');
+    }
+  });
+
+  /* --------------------------------------------------------- code boxes */
+
+  boxes.forEach(function (box, i) {
+    box.addEventListener('input', function () {
+      box.value = box.value.replace(/\D/g, '').slice(0, 1);
+      if (box.value && i < boxes.length - 1) boxes[i + 1].focus();
+      if (boxes.every(function (b) { return b.value; })) codeBtn.focus();
+    });
+
+    box.addEventListener('keydown', function (e) {
+      if (e.key === 'Backspace' && !box.value && i > 0) {
+        boxes[i - 1].focus();
+        boxes[i - 1].value = '';
+        e.preventDefault();
+      }
+      if (e.key === 'ArrowLeft' && i > 0) { boxes[i - 1].focus(); e.preventDefault(); }
+      if (e.key === 'ArrowRight' && i < boxes.length - 1) { boxes[i + 1].focus(); e.preventDefault(); }
+    });
+
+    // Pasting the whole code into any box fills the row.
+    box.addEventListener('paste', function (e) {
+      const text = (e.clipboardData || window.clipboardData).getData('text') || '';
+      const digits = text.replace(/\D/g, '').slice(0, 6);
+      if (!digits) return;
+      e.preventDefault();
+      boxes.forEach(function (b, n) { b.value = digits[n] || ''; });
+      const next = Math.min(digits.length, boxes.length - 1);
+      boxes[next].focus();
+    });
+  });
+
+  /* ------------------------------------------------------------- resend */
+
+  function startCooldown() {
+    cooling = 60;
+    tick();
+    clearInterval(coolTimer);
+    coolTimer = setInterval(tick, 1000);
+  }
+
+  function tick() {
+    if (cooling <= 0) {
+      clearInterval(coolTimer);
+      resendBtn.disabled = false;
+      resendBtn.textContent = 'Resend code';
+      return;
+    }
+    resendBtn.disabled = true;
+    resendBtn.textContent = 'Resend in ' + cooling + 's';
+    cooling -= 1;
+  }
+
+  resendBtn.addEventListener('click', async function () {
+    if (resendBtn.disabled || !email) return;
+    clearNote();
+    resendBtn.disabled = true;
+    resendBtn.textContent = 'Sending…';
+    const sent = await sendCode(email);
+    if (sent) say('New code sent.', 'ok');
+    startCooldown();
+  });
+
+  backBtn.addEventListener('click', function () {
+    clearInterval(coolTimer);
+    clearNote();
+    email = '';
+    boxes.forEach(function (b) { b.value = ''; });
+    codeStep.hidden = true;
+    emailStep.hidden = false;
+    emailInput.focus();
+    emailInput.select();
+  });
+
+  /* ------------------------------------------------------------- errors */
+
+  function friendly(error) {
+    const raw = (error && error.message ? error.message : String(error)).toLowerCase();
+    if (raw.indexOf('rate limit') !== -1 || raw.indexOf('too many') !== -1) {
+      return 'Too many attempts for now. Wait a minute, then try again.';
+    }
+    if (raw.indexOf('expired') !== -1) {
+      return 'That code has expired. Send a new one.';
+    }
+    if (raw.indexOf('invalid') !== -1 || raw.indexOf('token') !== -1) {
+      return 'That code is not right. Check it and try again.';
+    }
+    if (raw.indexOf('not authorized') !== -1 || raw.indexOf('signups not allowed') !== -1) {
+      return 'That address is not allowed to sign in.';
+    }
+    return error && error.message ? error.message : 'Something went wrong. Try again.';
+  }
+
+  /* --------------------------------------------------------------- boot */
+
+  const REASONS = {
+    expired: 'Your session ended. Sign in again.',
+    domain:  'That account is not a Safaricom address.',
+    revoked: 'Your access to the receipt review has been removed. ' +
+             'Ask Mikias Dereje if you think this is a mistake.'
+  };
+
+  const reason = new URLSearchParams(location.search).get('reason');
+  if (REASONS[reason]) say(REASONS[reason]);
+
+  // Already signed in? Skip the form entirely.
+  auth.ready.then(function (a) {
+    if (a.signedIn) { location.replace(destination()); return; }
+    if (a.error && REASONS[a.error]) say(REASONS[a.error]);
+    else if (a.error) say(a.error);
+  });
+
+  emailInput.focus();
+})();
+</script>
+
+</body>
+</html>

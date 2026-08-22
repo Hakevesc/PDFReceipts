@@ -1,0 +1,281 @@
+/* ==========================================================================
+   Sign-in — the login page, and the "signed in as" chip on the homepage.
+
+   The chip is chrome: it is removed in print alongside the comment rail, so
+   the A4 artwork is never affected.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap');
+
+:root {
+  --rc-primary: #FE353D;
+  --rc-primary-dark: #C41520;
+  --rc-ink: #1C1C21;
+  --rc-ink-low: #7C7C87;
+  --rc-border: #E8E8EC;
+  --rc-surface: #FFF;
+  --rc-surface-alt: #F7F7F8;
+  --rc-danger: #C41520;
+}
+
+/* ---------------------------------------------------------------- the page */
+
+/* login.html is a bare page with no global reset of its own, so without this
+   `width: 100%` on a padded input resolves to 100% + padding and the field
+   pushes out past the card edge. */
+.rc-login-body,
+.rc-login-body *,
+.rc-login-body *::before,
+.rc-login-body *::after {
+  box-sizing: border-box;
+}
+
+.rc-login-body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #F5F5F5;
+  font-family: 'Barlow', Arial, sans-serif;
+  color: var(--rc-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.rc-login {
+  width: 100%;
+  max-width: 520px;
+  text-align: center;
+}
+
+.rc-login-logo {
+  height: 46px;
+  width: auto;
+  margin-bottom: 32px;
+}
+
+.rc-login h1 {
+  margin: 0 0 10px;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.8px;
+}
+
+.rc-login-sub {
+  margin: 0 0 36px;
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--rc-ink-low);
+}
+
+/* ---------------------------------------------------------------- the card */
+
+.rc-card {
+  padding: 34px 32px 28px;
+  border: 1px solid var(--rc-border);
+  border-radius: 18px;
+  background: var(--rc-surface);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  text-align: left;
+}
+
+.rc-field {
+  display: block;
+  width: 100%;
+  padding: 15px 18px;
+  border: 1px solid var(--rc-border);
+  border-radius: 11px;
+  background: var(--rc-surface);
+  font-family: 'Barlow', Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--rc-ink);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rc-field::placeholder { color: #AEAEB8; font-weight: 400; }
+
+.rc-field:focus {
+  outline: none;
+  border-color: var(--rc-primary);
+  box-shadow: 0 0 0 3px rgba(254, 53, 61, 0.12);
+}
+
+.rc-submit {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 15px 18px;
+  border: 0;
+  border-radius: 11px;
+  background: var(--rc-primary-dark);
+  font-family: 'Barlow', Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: #FFF;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.rc-submit:hover:not(:disabled) { background: #A81119; }
+
+.rc-submit:disabled { opacity: 0.55; cursor: default; }
+
+.rc-fine {
+  margin: 16px 0 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--rc-ink-low);
+  text-align: center;
+}
+
+/* ------------------------------------------------------------ code entry */
+
+.rc-sent {
+  margin: 0 0 20px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--rc-ink-low);
+  text-align: center;
+}
+
+.rc-sent b { color: var(--rc-ink); font-weight: 600; }
+
+.rc-code {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.rc-code input {
+  width: 60px;
+  height: 70px;
+  padding: 0;
+  border: 1px solid var(--rc-border);
+  border-radius: 12px;
+  background: var(--rc-surface);
+  font-family: 'Barlow', Arial, sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--rc-ink);
+  text-align: center;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rc-code input:focus {
+  outline: none;
+  border-color: var(--rc-primary);
+  box-shadow: 0 0 0 3px rgba(254, 53, 61, 0.12);
+}
+
+.rc-alt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.rc-textlink {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: 'Barlow', Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--rc-primary-dark);
+  cursor: pointer;
+}
+
+.rc-textlink:hover:not(:disabled) { text-decoration: underline; }
+
+.rc-textlink:disabled { color: var(--rc-ink-low); cursor: default; }
+
+/* ---------------------------------------------------------------- notices */
+
+.rc-note {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.rc-note[hidden] { display: none; }
+
+.rc-note.is-error {
+  background: #FFF1F2;
+  border: 1px solid #F7CDD1;
+  color: var(--rc-danger);
+}
+
+.rc-note.is-ok {
+  background: #F1FAF2;
+  border: 1px solid #CDE9D3;
+  color: #157A2B;
+}
+
+.rc-login-foot {
+  margin-top: 28px;
+  font-size: 13px;
+  color: #9A9AA4;
+  text-align: center;
+}
+
+/* ------------------------------------------------------- signed-in chip */
+
+.rc-who {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px 5px 12px;
+  border: 1px solid var(--rc-border);
+  border-radius: 20px;
+  background: var(--rc-surface);
+  font-family: 'Barlow', Arial, sans-serif;
+  white-space: nowrap;
+}
+
+.rc-who-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--rc-ink);
+}
+
+.rc-who-out {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--rc-surface-alt);
+  font-family: 'Barlow', Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--rc-ink-low);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.rc-who-out:hover { background: #ECECF0; color: var(--rc-ink); }
+
+/* The six boxes are what force a minimum width, so they shrink first. */
+@media (max-width: 560px) {
+  .rc-login h1 { font-size: 30px; letter-spacing: -0.4px; }
+  .rc-login-sub { font-size: 15px; margin-bottom: 26px; }
+  .rc-card { padding: 26px 20px 22px; }
+  .rc-code { gap: 7px; }
+  .rc-code input { width: 46px; height: 56px; font-size: 24px; }
+}
+
+@media (max-width: 380px) {
+  .rc-code { gap: 5px; }
+  .rc-code input { width: 40px; height: 50px; font-size: 21px; border-radius: 9px; }
+}
+
+@media print {
+  .rc-who { display: none !important; }
+}
