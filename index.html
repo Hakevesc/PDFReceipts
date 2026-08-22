@@ -194,7 +194,22 @@
 
   /* Category Section */
   .category {
-    margin-bottom: 32px;
+    margin-bottom: 20px;
+    padding: 6px;
+    border: 1px solid var(--Border);
+    border-radius: 14px;
+    background: linear-gradient(180deg, var(--Surface-Container), #F4F4F6);
+    transition: box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+
+  .category:hover { border-color: #DEDEE4; }
+
+  .category[data-open="true"] {
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.05);
+  }
+
+  .category .receipt-grid {
+    padding: 0 6px 8px;
   }
 
   .category-title {
@@ -227,7 +242,7 @@
     margin-left: auto;
     width: 28px;
     height: 28px;
-    padding: 7px;
+    padding: 6px;
     flex: none;
     border-radius: 50%;
     background: var(--Primary);
@@ -235,10 +250,8 @@
     stroke: #FFF;
     stroke-width: 2.6;
     stroke-linecap: round;
-    stroke-linejoin: round;
     box-shadow: 0 1px 4px rgba(254, 53, 61, 0.30);
-    transform: rotate(90deg);
-    transition: transform 0.18s ease, background 0.15s ease, box-shadow 0.15s ease;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
   }
 
   .category-title:hover .cat-chevron {
@@ -246,7 +259,18 @@
     box-shadow: 0 2px 8px rgba(196, 21, 32, 0.38);
   }
 
-  .category[data-open="false"] .cat-chevron { transform: rotate(0deg); }
+  /* open shows a minus, closed shows a plus */
+  .cat-bar-v {
+    transform-origin: center;
+    transition: transform 0.18s ease, opacity 0.18s ease;
+    transform: scaleY(0);
+    opacity: 0;
+  }
+
+  .category[data-open="false"] .cat-bar-v {
+    transform: scaleY(1);
+    opacity: 1;
+  }
 
   .category-title .cat-count {
     font-size: 12.5px;
@@ -456,17 +480,17 @@
     <button class="category-title" type="button" aria-expanded="true" aria-controls="customerList">
       <span class="cat-name">Merchant | Customer Receipt</span>
       <span class="cat-count" id="customerCount"></span>
-      <svg class="cat-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      <svg class="cat-chevron" viewBox="0 0 24 24" aria-hidden="true"><line class="cat-bar-h" x1="5" y1="12" x2="19" y2="12"/><line class="cat-bar-v" x1="12" y1="5" x2="12" y2="19"/></svg>
     </button>
     <div class="receipt-grid" id="customerList"></div>
   </div>
 
   <!-- Business -->
-  <div class="category" data-open="true">
-    <button class="category-title" type="button" aria-expanded="true" aria-controls="businessList">
+  <div class="category" data-open="false">
+    <button class="category-title" type="button" aria-expanded="false" aria-controls="businessList">
       <span class="cat-name">Merchant | Business Receipt</span>
       <span class="cat-count" id="businessCount"></span>
-      <svg class="cat-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      <svg class="cat-chevron" viewBox="0 0 24 24" aria-hidden="true"><line class="cat-bar-h" x1="5" y1="12" x2="19" y2="12"/><line class="cat-bar-v" x1="12" y1="5" x2="12" y2="19"/></svg>
     </button>
     <div class="receipt-grid" id="businessList"></div>
   </div>

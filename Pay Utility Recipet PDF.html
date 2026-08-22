@@ -11,7 +11,7 @@
 
  * { margin: 0; padding: 0; box-sizing: border-box; }
 
- body {
+ body { display: flex; justify-content: center; padding: 20px;
  font-family: 'Inter', Arial, sans-serif;
  background: #E8E8E8;
  
@@ -19,7 +19,7 @@
  color: #1C1C21;
  }
 
- .page { width: 793.7px; height: 1122.5px; background: #FFF; position: relative; padding: 45.4px 52.9px; display: flex; flex-direction: column; padding-bottom: 75.6px; }
+ .page { width: 793.7px; min-height: 1122.5px; background: #FFF; position: relative; padding: 45.4px 52.9px; display: flex; flex-direction: column; padding-bottom: 75.6px;  box-shadow: 0 10px 40px rgba(0,0,0,0.15);}
 
  /* ===== HEADER ===== */
  .header {
@@ -297,7 +297,7 @@
 
  @media print {
  body { background: #FFF; padding: 0; }
- .page { width: 793.7px; height: 1122.5px; display: flex; flex-direction: column; padding-bottom: 75.6px; }
+ .page { box-shadow: none; width: 793.7px; height: 1122.5px; display: flex; flex-direction: column; padding-bottom: 75.6px; }
  }
 
  @media screen and (max-width: 800px) {

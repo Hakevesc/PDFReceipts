@@ -8,8 +8,8 @@
  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
  
  * { margin: 0; padding: 0; box-sizing: border-box; }
- body { font-family: 'Inter', Arial, sans-serif; background: #E8E8E8; color: #1C1C21; }
- .page { width: 793.7px; height: 1122.5px; background: #FFF; position: relative; padding: 45.4px 52.9px; display: flex; flex-direction: column; padding-bottom: 75.6px; }
+ body { display: flex; justify-content: center; padding: 20px; font-family: 'Inter', Arial, sans-serif; background: #E8E8E8; color: #1C1C21; }
+ .page { width: 793.7px; min-height: 1122.5px; background: #FFF; position: relative; padding: 45.4px 52.9px; display: flex; flex-direction: column; padding-bottom: 75.6px;  box-shadow: 0 10px 40px rgba(0,0,0,0.15);}
  .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15.1px; padding-bottom: 15.1px; border-bottom: 1px solid #E0E0E0; }
  .header-left { flex: 1; }
  .mpesa-logo { height: 56.7px; width: auto; margin-bottom: 11.3px; }
@@ -50,7 +50,7 @@
  .footer-bar { position: absolute; bottom: 0; left: 0; right: 0; background: #FE353D; padding: 11.3px 22.7px; display: flex; justify-content: flex-end; align-items: center; }
  .footer-bar img { height: 30.2px; width: auto; }
  .mpesa-watermark-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-25deg); font-family: 'Poppins', sans-serif; font-size: 140px; font-weight: 900; color: rgba(180, 180, 180, 0.2); letter-spacing: 12px; white-space: nowrap; pointer-events: none; z-index: 100; user-select: none; }
- @media print { body { background: #FFF; padding: 0; } .page { width: 793.7px; height: 1122.5px; display: flex; flex-direction: column; padding-bottom: 75.6px; } }
+ @media print { body { background: #FFF; padding: 0; } .page { box-shadow: none; width: 793.7px; height: 1122.5px; display: flex; flex-direction: column; padding-bottom: 75.6px; } }
  @media screen and (max-width: 800px) { .page { width: 100%; min-height: auto; display: flex; flex-direction: column; padding-bottom: 75.6px; } body { } }
 </style>
 </head>
