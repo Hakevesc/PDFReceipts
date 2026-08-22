@@ -72,6 +72,115 @@
     color: var(--On-Surface-Low);
   }
 
+  .header-divider {
+    width: 1px;
+    height: 30px;
+    background: var(--Border);
+    flex: none;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* Audience menu — Merchant today, Consumer once it exists */
+  .menu { position: relative; }
+
+  .menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 12px;
+    border: 1px solid var(--Border);
+    border-radius: 8px;
+    background: var(--Gray-0);
+    font-family: 'Switzer', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--On-Surface);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .menu-btn:hover { border-color: #D5D5DC; background: var(--Surface-Container); }
+
+  .menu-btn[aria-expanded="true"] {
+    border-color: var(--Primary);
+    background: var(--Gray-0);
+  }
+
+  .menu-caret {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: var(--On-Surface-Low);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.16s ease;
+  }
+
+  .menu-btn[aria-expanded="true"] .menu-caret { transform: rotate(180deg); }
+
+  .menu-list {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 190px;
+    padding: 5px;
+    border: 1px solid var(--Border);
+    border-radius: 10px;
+    background: var(--Gray-0);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+    display: none;
+    z-index: 20;
+  }
+
+  .menu.is-open .menu-list { display: block; }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 10px;
+    border: 0;
+    border-radius: 7px;
+    background: none;
+    font-family: 'Switzer', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--On-Surface);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .menu-item:hover:not([disabled]) { background: var(--Surface-Container); }
+
+  .menu-item.is-current {
+    color: var(--Primary);
+    font-weight: 600;
+  }
+
+  .menu-item[disabled] {
+    color: var(--On-Surface-Low);
+    cursor: not-allowed;
+  }
+
+  .menu-note {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: var(--On-Surface-Low);
+    background: #F1F1F4;
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+
   .count-badge {
     background: var(--Primary);
     color: #FFF;
@@ -115,6 +224,7 @@
   }
 
   .cat-chevron {
+    margin-left: auto;
     width: 28px;
     height: 28px;
     padding: 7px;
@@ -315,20 +425,38 @@
   <div class="header">
     <div class="header-left">
       <img src="assets/M-PESA-red-logo.svg" alt="M-PESA" class="logo" onerror="this.style.display='none'">
+      <span class="header-divider" aria-hidden="true"></span>
       <div>
         <h1>M-PESA PDF Receipts</h1>
-        <div class="sub">M-PESA transaction receipts & statements</div>
+        <div class="sub">Transaction receipts &amp; statements</div>
       </div>
     </div>
-    <span class="count-badge" id="totalCount">0 receipts</span>
+
+    <div class="header-right">
+      <div class="menu" id="audienceMenu">
+        <button class="menu-btn" type="button" aria-haspopup="true" aria-expanded="false">
+          <span class="menu-label">Merchant</span>
+          <svg class="menu-caret" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="menu-list" role="menu">
+          <button class="menu-item is-current" type="button" role="menuitem" aria-current="true">
+            Merchant
+          </button>
+          <button class="menu-item" type="button" role="menuitem" disabled aria-disabled="true">
+            Consumer <span class="menu-note">not active</span>
+          </button>
+        </div>
+      </div>
+      <span class="count-badge" id="totalCount">0 receipts</span>
+    </div>
   </div>
 
   <!-- Customer -->
   <div class="category" data-open="true">
     <button class="category-title" type="button" aria-expanded="true" aria-controls="customerList">
-      <svg class="cat-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
       <span class="cat-name">Merchant | Customer Receipt</span>
       <span class="cat-count" id="customerCount"></span>
+      <svg class="cat-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
     <div class="receipt-grid" id="customerList"></div>
   </div>
@@ -336,16 +464,13 @@
   <!-- Business -->
   <div class="category" data-open="true">
     <button class="category-title" type="button" aria-expanded="true" aria-controls="businessList">
-      <svg class="cat-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
       <span class="cat-name">Merchant | Business Receipt</span>
       <span class="cat-count" id="businessCount"></span>
+      <svg class="cat-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
     <div class="receipt-grid" id="businessList"></div>
   </div>
 
-  <div class="footer-note">
-    M-PESA — <a href="index.html">Home</a>
-  </div>
 
 </div>
 
@@ -462,7 +587,31 @@
   renderList('businessList', business);
 
   document.getElementById('totalCount').textContent =
-    receipts.filter(r => !r.disabled).length + ' Merchant receipts';
+    receipts.filter(r => !r.disabled).length + ' receipts';
+
+  // Audience menu. Only Merchant exists today; Consumer is shown but inert.
+  (function () {
+    const menu = document.getElementById('audienceMenu');
+    if (!menu) return;
+    const btn = menu.querySelector('.menu-btn');
+    const setOpen = (open) => {
+      menu.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', String(open));
+    };
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setOpen(!menu.classList.contains('is-open'));
+    });
+    document.addEventListener('click', (e) => {
+      if (!menu.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    });
+    menu.querySelectorAll('.menu-item:not([disabled])').forEach((item) => {
+      item.addEventListener('click', () => setOpen(false));
+    });
+  })();
 
   // Categories collapse so a long list can be tucked away. The open/closed
   // choice is remembered between visits.
