@@ -26,7 +26,10 @@
              placeholder="Enter your Safaricom email address" autocomplete="email"
              autocapitalize="off" spellcheck="false" required>
       <button class="rc-submit" id="emailSubmit" type="submit">Continue with email</button>
-      <p class="rc-fine">Safaricom addresses only. No password — we email you a code.</p>
+      <p class="rc-fine">Safaricom addresses only. We email you a code.</p>
+      <div class="rc-alt">
+        <button class="rc-textlink" id="pwLink" type="button">I have a password instead</button>
+      </div>
     </form>
 
     <!-- Step 2 — six-digit code -->
@@ -38,7 +41,25 @@
       <button class="rc-submit" id="codeSubmit" type="submit">Verify and continue</button>
       <div class="rc-alt">
         <button class="rc-textlink" id="backBtn" type="button">Use a different email</button>
+        <button class="rc-textlink" id="codePwBtn" type="button">Use a password</button>
         <button class="rc-textlink" id="resendBtn" type="button">Resend code</button>
+      </div>
+    </form>
+
+    <!-- Step 2b — password.
+         The way in when the code email cannot be delivered: Supabase's own
+         mailer only sends to the project team, so until custom SMTP is on,
+         a colleague can be given a password in the dashboard instead. Same
+         session, same policies afterwards — access is still the members row,
+         never the way you signed in. -->
+    <form id="pwStep" novalidate hidden>
+      <p class="rc-sent">Signing in as <b id="pwWho"></b>.</p>
+      <input class="rc-field" id="password" type="password" name="password"
+             placeholder="Your password" autocomplete="current-password" required>
+      <button class="rc-submit" id="pwSubmit" type="submit">Sign in</button>
+      <div class="rc-alt">
+        <button class="rc-textlink" id="pwBackBtn" type="button">Use a different email</button>
+        <button class="rc-textlink" id="pwCodeBtn" type="button">Email me a code</button>
       </div>
     </form>
 
@@ -62,6 +83,15 @@
   const resendBtn  = document.getElementById('resendBtn');
   const sentTo     = document.getElementById('sentTo');
   const note       = document.getElementById('note');
+
+  const pwStep     = document.getElementById('pwStep');
+  const pwInput    = document.getElementById('password');
+  const pwBtn      = document.getElementById('pwSubmit');
+  const pwLink     = document.getElementById('pwLink');
+  const pwBackBtn  = document.getElementById('pwBackBtn');
+  const pwCodeBtn  = document.getElementById('pwCodeBtn');
+  const codePwBtn  = document.getElementById('codePwBtn');
+  const pwWho      = document.getElementById('pwWho');
 
   // Supabase decides how long the code is; the page follows it rather than
   // assuming six. Mismatch here is the difference between a code that can be
@@ -95,6 +125,16 @@
   }
 
   function clearNote() { note.hidden = true; }
+
+  /* ------------------------------------------------------------- stepping
+     Three panels, one visible at a time. Kept in one place so a new step
+     can never leave an old one on screen. */
+
+  function showStep(which) {
+    emailStep.hidden = which !== 'email';
+    codeStep.hidden  = which !== 'code';
+    pwStep.hidden    = which !== 'password';
+  }
 
   /* ------------------------------------------------------------ where to */
 
@@ -133,8 +173,7 @@
 
     email = value;
     sentTo.textContent = value;
-    emailStep.hidden = true;
-    codeStep.hidden = false;
+    showStep('code');
     say('Code sent. Check your inbox, and your spam folder.', 'ok');
     startCooldown();
     boxes[0].focus();
@@ -267,27 +306,150 @@
     clearNote();
     email = '';
     boxes.forEach(function (b) { b.value = ''; });
-    codeStep.hidden = true;
-    emailStep.hidden = false;
+    showStep('email');
     emailInput.focus();
     emailInput.select();
   });
 
+  /* ----------------------------------------------------------- password
+     A second door, for when the code email does not arrive. It grants
+     nothing extra: the session it produces is the same one the code
+     produces, and every policy still re-checks the members row. */
+
+  function toPassword() {
+    clearInterval(coolTimer);
+    clearNote();
+    pwWho.textContent = email;
+    pwInput.value = '';
+    showStep('password');
+    pwInput.focus();
+  }
+
+  pwLink.addEventListener('click', function () {
+    const value = emailInput.value.trim().toLowerCase();
+    if (!auth.isAllowedEmail(value)) {
+      clearNote();
+      say('Type your Safaricom email address first, then sign in with your password.');
+      emailInput.focus();
+      return;
+    }
+    email = value;
+    toPassword();
+  });
+
+  // Offered on the code step as well, since waiting on the code step is
+  // where you find out the mail is not coming.
+  codePwBtn.addEventListener('click', function () {
+    if (!email) return;
+    boxes.forEach(function (b) { b.value = ''; });
+    toPassword();
+  });
+
+  pwBackBtn.addEventListener('click', function () {
+    clearNote();
+    email = '';
+    pwInput.value = '';
+    showStep('email');
+    emailInput.focus();
+    emailInput.select();
+  });
+
+  pwCodeBtn.addEventListener('click', async function () {
+    if (!email) return;
+    clearNote();
+    pwInput.value = '';
+    pwCodeBtn.disabled = true;
+    const sent = await sendCode(email);
+    pwCodeBtn.disabled = false;
+    if (!sent) return;
+    sentTo.textContent = email;
+    showStep('code');
+    say('Code sent. Check your inbox, and your spam folder.', 'ok');
+    startCooldown();
+    boxes[0].focus();
+  });
+
+  pwStep.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    clearNote();
+
+    const secret = pwInput.value;
+    if (!secret) { say('Enter your password.'); pwInput.focus(); return; }
+
+    pwBtn.disabled = true;
+    pwBtn.textContent = 'Signing in…';
+
+    try {
+      const client = await auth.getClient();
+      const { data, error } = await client.auth.signInWithPassword({
+        email: email, password: secret
+      });
+
+      if (error || !data || !data.session) {
+        pwBtn.disabled = false;
+        pwBtn.textContent = 'Sign in';
+        say(error ? friendly(error) : 'That password did not work. Try again.');
+        pwInput.value = '';
+        pwInput.focus();
+        return;
+      }
+      location.replace(destination());
+    } catch (err) {
+      pwBtn.disabled = false;
+      pwBtn.textContent = 'Sign in';
+      say('Could not reach the sign-in service. Check your connection and try again.');
+    }
+  });
+
   /* ------------------------------------------------------------- errors */
 
+  // The mail failures are spelled out on purpose. They are the ones that look
+  // like "the site is broken for me but works for him", and the person seeing
+  // them cannot fix them — so the message has to say what is wrong, who fixes
+  // it, and what to do in the meantime.
   function friendly(error) {
     const raw = (error && error.message ? error.message : String(error)).toLowerCase();
-    if (raw.indexOf('rate limit') !== -1 || raw.indexOf('too many') !== -1) {
+
+    // Supabase's built-in mailer refuses any recipient who is not a member of
+    // the project team. It is the usual reason one address gets codes and no
+    // other does. Only custom SMTP cures it.
+    if (raw.indexOf('not authorized') !== -1) {
+      return 'The mail service refused to send to that address, because custom ' +
+             'SMTP is not switched on for this project. Use a password instead, ' +
+             'or ask Mikias Dereje to turn SMTP on.';
+    }
+
+    // SMTP is configured but the handoff failed — a revoked Gmail app password
+    // is the common cause.
+    if (raw.indexOf('error sending') !== -1 || raw.indexOf('smtp') !== -1) {
+      return 'The code could not be emailed — the mail service rejected it. ' +
+             'Use a password instead, and tell Mikias Dereje the SMTP password ' +
+             'needs checking.';
+    }
+
+    if (raw.indexOf('rate limit') !== -1 || raw.indexOf('too many') !== -1 ||
+        raw.indexOf('for security purposes') !== -1) {
       return 'Too many attempts for now. Wait a minute, then try again.';
+    }
+    if (raw.indexOf('signups not allowed') !== -1 ||
+        raw.indexOf('signup is disabled') !== -1 ||
+        raw.indexOf('signup_disabled') !== -1) {
+      return 'This address has never signed in here and new sign-ups are ' +
+             'switched off. Ask Mikias Dereje to add you.';
     }
     if (raw.indexOf('expired') !== -1) {
       return 'That code has expired. Send a new one.';
     }
+    // Wrong password, as opposed to a wrong code — both come back as "invalid".
+    if (raw.indexOf('invalid login credentials') !== -1) {
+      return 'That email and password do not match. Check them, or ask for a code instead.';
+    }
+    if (raw.indexOf('email not confirmed') !== -1) {
+      return 'That account has not been confirmed yet. Ask Mikias Dereje to ' +
+             'confirm it in Supabase.';
+    }
     if (raw.indexOf('invalid') !== -1 || raw.indexOf('token') !== -1) {
       return 'That code is not right. Check it and try again.';
-    }
-    if (raw.indexOf('not authorized') !== -1 || raw.indexOf('signups not allowed') !== -1) {
-      return 'That address is not allowed to sign in.';
     }
     return error && error.message ? error.message : 'Something went wrong. Try again.';
   }

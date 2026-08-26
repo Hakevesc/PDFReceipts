@@ -185,6 +185,53 @@ to about 50. The field stays locked until SMTP is configured.
 
 Never put the app password in this repo. It belongs in the Supabase dashboard only.
 
+### When the code only reaches one person
+
+The symptom is unmistakable: one address gets codes and every other `@safaricom.et`
+address gets nothing. It is never the code in this repo — `login.html` runs the same
+single `signInWithOtp()` call for every address and special-cases nobody. It is the
+mailer.
+
+Supabase's **built-in** mailer refuses any recipient who is not a member of the project
+team, and answers `Email address not authorized`. Whoever created the project is a team
+member; the colleagues you are inviting are not. So until custom SMTP is switched on, the
+project owner is the only person who can receive a code. Check in this order:
+
+1. **Project Settings → Authentication → SMTP Settings** — is it actually enabled, with a
+   current 16-character app password? A revoked app password fails with
+   `Error sending confirmation email`.
+2. **Authentication → Rate Limits → emails per hour** — if it is *locked at 2*, SMTP is
+   definitively not on.
+3. **Authentication → Logs**, filtered to the failing address — the reason is logged
+   verbatim.
+4. **Authentication → Email Templates → Confirm signup** must contain `{{ .Token }}`. A
+   first-time reviewer gets that template, not Magic Link. Miss it and they receive a
+   *link* rather than a code, which looks like "the code never came" too.
+
+The login page now names each of these on screen rather than saying "that address is not
+allowed to sign in", so the person who is stuck can read what is wrong and who fixes it.
+
+### The second door: a password
+
+So that a colleague is never blocked on the mail working, `login.html` also accepts a
+password — **I have a password instead** on the first step, and **Use a password** while
+waiting on a code. It grants nothing extra: `signInWithPassword` produces the same session
+the code produces, and every policy still re-checks the `members` row. Access is the row,
+never the way you signed in.
+
+To give someone one, **Authentication → Users → Add user**:
+
+| Field | Value |
+| --- | --- |
+| Email | their `@safaricom.et` address |
+| Password | anything; they cannot change it themselves |
+| Auto Confirm User | **ticked** — without it sign-in fails with `Email not confirmed`, and confirming needs the mail that does not work |
+
+Creating the user fires `rc_enrol_member()`, so their `members` row appears on its own and
+they have access immediately. Send the password over Teams, not email. Revoking is
+unchanged: `delete from public.members where email = '…'` — deleting the auth user alone
+does not revoke.
+
 ### Making Supabase send a code instead of a link
 
 By default Supabase emails a magic link. Edit **both** templates under
@@ -226,7 +273,7 @@ with Access is the cheapest route — which is a hosting change, not a code chan
 | --- | --- |
 | `assets/auth.js` | Keys, the Supabase client, the session, the redirect to login, the admin lookup |
 | `assets/auth.css` | Login page and the "signed in as" chip |
-| `login.html` | The sign-in page — email, then the 6-digit code |
+| `login.html` | The sign-in page — email, then the emailed code, or a password |
 | `supabase-auth-setup.sql` | The policies that make any of it real. Run once |
 | `assets/comments.js` | The widget — rail, pins, anchoring, composer |
 | `assets/comments.css` | Panel and pin styling, plus the print and small-screen rules |
