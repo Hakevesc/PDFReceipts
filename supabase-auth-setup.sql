@@ -15,6 +15,52 @@
 -- ===========================================================================
 
 
+-- ------------------------------------------------------------ 0. the table
+-- The comments themselves. This used to live only in the README, which made
+-- this file quietly depend on somebody having read it first — and on a fresh
+-- project the dependency announces itself as
+--
+--     ERROR: 42P01: relation "public.comments" does not exist
+--
+-- from section 4 below, several screens after the thing that was actually
+-- missing. Creating it here makes "run this once" true.
+--
+-- if not exists, so running this against the project that already holds
+-- months of comments changes nothing at all.
+
+create table if not exists public.comments (
+  id           uuid primary key default gen_random_uuid(),
+  receipt      text        not null,
+  parent_id    uuid        references public.comments(id) on delete cascade,
+  anchor_label text,
+  anchor_path  text,
+  anchor_x     real,
+  anchor_y     real,
+  author       text        not null,
+  body         text        not null,
+  resolved     boolean     not null default false,
+  created_at   timestamptz not null default now()
+);
+
+-- Every read the panel does is "this receipt, oldest first".
+create index if not exists comments_receipt_idx
+  on public.comments (receipt, created_at);
+
+-- Live updates. Without this the feature still works — comments appear on
+-- reload instead of instantly — so a project where it is already added, or a
+-- plan without realtime, is not an error worth stopping for.
+do $$
+begin
+  alter publication supabase_realtime add table public.comments;
+exception
+  when others then null;   -- already published, no such publication, or not
+                           -- ours to alter. All three are survivable: this
+                           -- block buys instant updates, not correctness, and
+                           -- it must never be the reason setup stops.
+end
+$$;
+
+
 -- ---------------------------------------------------------------- 1. roster
 -- One table for everything: who may sign in, who is an admin, who was last
 -- here. Presence of the row IS the access.
