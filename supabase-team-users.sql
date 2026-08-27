@@ -53,6 +53,7 @@ begin
         ('danile@safaricom.et',            'Danile',  false,  'PASTE-DANILE-PASSWORD'),
         ('melat@safaricom.et',             'Melat',   false,  'PASTE-MELAT-PASSWORD'),
         ('maedot@safaricom.et',            'Maedot',  false,  'PASTE-MAEDOT-PASSWORD'),
+        ('qa.safaricom@safaricom.et',      'QA',      false,  'PASTE-QA-PASSWORD'),
         ('mikias.dereje@safaricom.et',     'Mikias',  true,   'PASTE-MIKIAS-PASSWORD')
       ) as t(email, name, is_admin, password)
   loop
