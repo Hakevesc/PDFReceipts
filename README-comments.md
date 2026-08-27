@@ -10,51 +10,51 @@ print, and the A4 page keeps its exact geometry.
 ## 1. Create the Supabase project
 
 1. Sign up at [supabase.com](https://supabase.com) and create a project.
-2. Open **SQL Editor** and run:
 
-```sql
-create table public.comments (
-  id           uuid primary key default gen_random_uuid(),
-  receipt      text        not null,
-  parent_id    uuid        references public.comments(id) on delete cascade,
-  anchor_label text,
-  anchor_path  text,
-  anchor_x     real,
-  anchor_y     real,
-  author       text        not null,
-  body         text        not null,
-  resolved     boolean     not null default false,
-  created_at   timestamptz not null default now()
-);
+2. Open the **SQL Editor** and run the files from this repo **in this order**. Each one
+   assumes the one before it has run, and each is safe to run twice.
 
-create index comments_receipt_idx on public.comments (receipt, created_at);
+   | Order | File | What it does |
+   | --- | --- | --- |
+   | 1 | `supabase-auth-setup.sql` | The `comments` table, the `members` roster, and every policy that makes the login real |
+   | 2 | `supabase-signin-log.sql` | The `sign_ins` register — who got in and when |
+   | 3 | `supabase-team-users.sql` | The reviewers, with passwords. Edit the list at the top first |
 
-alter table public.comments enable row level security;
+   Order is the whole of it. Running the second or third file first fails with
+   `relation "public.members" does not exist`, and an older copy of the first file that
+   did not create `comments` fails with `relation "public.comments" does not exist` —
+   the missing thing is named, but several screens after the step that was skipped.
 
--- policies come from supabase-auth-setup.sql, see "Sign-in" below
-```
-
-3. For live updates, go to **Database → Replication** and add `comments` to the
-   `supabase_realtime` publication. Without this the feature still works; comments just
-   appear on reload instead of instantly.
-
-4. Run **`supabase-auth-setup.sql`** from this repo in the same SQL Editor. It replaces
-   the open policies with ones keyed to a signed-in `@safaricom.et` session. Skipping it
-   leaves the table readable and writable by anyone — see **Sign-in** below.
+3. Live updates are switched on by the first file. If your plan has no realtime
+   publication it skips that quietly and the feature still works — comments appear on
+   reload instead of instantly. To check, **Database → Replication** should list
+   `comments` under `supabase_realtime`.
 
 ## 2. Add your keys
 
-Go to **Project Settings → API** and copy the **Project URL** and the **anon public**
+Go to **Project Settings → API** and copy the **Project URL** and the **publishable**
 key into the `CONFIG` block at the top of **`assets/auth.js`**. It is the only file that
 holds them now; `comments.js` and `comments-badges.js` reuse its client.
 
 ```js
 const CONFIG = {
   url: 'https://YOUR-PROJECT.supabase.co',
-  anonKey: 'eyJhbGciOi...',
+  anonKey: 'sb_publishable_…',
   ...
 };
 ```
+
+Both key formats work — `sb_publishable_…` is the current one, the older `eyJhbGciOi…`
+anon JWT is still accepted. Never paste the **service_role** or `sb_secret_…` key here:
+those bypass every policy, and this file is public.
+
+The two must belong to the same project. A URL from one project and a key from another
+fails every request with 401, which reads on screen as "could not reach the sign-in
+service".
+
+Changing them means changing `assets/auth.js`, so bump the `?v=` on both `auth.js` and
+`auth.css` in `login.html` at the same time. A browser holding the previous copy will
+otherwise keep talking to the old project.
 
 ## 3. Serve the files
 
@@ -100,7 +100,9 @@ or silently mis-attached.
 ## Sign-in
 
 Every page loads `assets/auth.js` first. Without a session it sends you to `login.html`,
-which asks for your email, mails a 6-digit code, and takes the code — no password, ever.
+which asks for your email and mails a code — eight digits, or however many
+`codeLength` in `auth.js` says, which must match the OTP length set in Supabase. A
+password is accepted as a second door when the mail cannot get through.
 The commenter name is derived from the address (`mikias.dereje@safaricom.et` becomes
 "Mikias Dereje"), so nobody types a name and nobody can post as someone else.
 
@@ -127,6 +129,48 @@ Delete the `members` row, **not** the user under *Authentication → Users*. Del
 auth user does not revoke anything — they would sign in again, be treated as new, and get
 auto-enrolled straight back. Deleting the `members` row sticks precisely because
 auto-enrolment only fires on a person's first-ever sign-in.
+
+### The register: who has signed in
+
+`members.last_seen_at` answers *is this person still around*. It cannot answer *who
+signed in last Tuesday*, because every page load overwrites it — and neither can
+`auth.users.last_sign_in_at`, which keeps one value for the same reason.
+**Table Editor → `sign_ins`** keeps a row per sign-in instead:
+
+| Column | Meaning |
+| --- | --- |
+| `email` | Taken from the verified session, never from the browser |
+| `method` | `code`, `password`, or `backfill` for what existed before this table |
+| `at` | When they got in |
+| `user_agent` | Their browser. Cosmetic, and the only field the page supplies |
+
+Run `supabase-signin-log.sql` once to create it. `login.html` then calls
+`rc_log_sign_in()` the moment a session appears, down either door. The address is not a
+parameter — the function reads it out of the JWT — so a browser cannot write a row under
+someone else's name, and the call is wrapped so that a failure loses a log line, never a
+sign-in.
+
+Only admins can read it. The policy is `rc_is_admin()`, the same column that gates
+resolve and delete, so a reviewer cannot see who else has been in.
+
+The query worth keeping — the roster with each person's real last sign-in beside it:
+
+```sql
+select m.email, m.name, m.is_admin, m.joined_at,
+       max(s.at)   as last_sign_in,
+       count(s.id) as sign_ins
+  from public.members m
+  left join public.sign_ins s on s.email = m.email
+ group by m.email, m.name, m.is_admin, m.joined_at
+ order by last_sign_in desc nulls last;
+```
+
+A row with `sign_ins` at zero is someone you added who never actually arrived — usually a
+password that was never passed on. `select method, count(*) from public.sign_ins group by
+method` is the other one to watch: if nobody is signing in with `code`, the mail is down
+and you will hear about it from the register before you hear about it from a colleague.
+
+More queries are written out at the foot of `supabase-signin-log.sql`.
 
 ### Signing in once per computer
 
@@ -232,6 +276,36 @@ they have access immediately. Send the password over Teams, not email. Revoking 
 unchanged: `delete from public.members where email = '…'` — deleting the auth user alone
 does not revoke.
 
+**Give yourself one before you need it.** The code email is the part of sign-in that can
+fail outside your control: the built-in mailer only reaches project team members, and
+Gmail SMTP stops the day an app password is revoked. When that happens nobody can get in
+— including the person who would fix it. An admin holding a password always can.
+
+`supabase-admin-user.sql` does it in one step: creates the auth user with the password
+already confirmed, writes the `auth.identities` row the dashboard would have written, and
+ticks `is_admin`. Re-running it with a new password rotates it. Paste the password into
+`v_password`, run it, then put the placeholder back — the file is committed, the password
+must not be.
+
+Sessions already open elsewhere survive a rotation; changing a password does not
+invalidate a token that has already been issued. To end those as well, *Authentication →
+Users →* the row *→ Sign out user*.
+
+Make the password long and random rather than memorable — you type it once per browser
+and then not again for months, so it belongs in a password manager, not in your head.
+
+**Making the whole team at once.** `supabase-team-users.sql` is the same thing for a list
+of people instead of one: edit the four rows at the top — address, name, admin flag,
+password — and run it. Each gets an account with the password already confirmed, the
+`auth.identities` row the dashboard would have written, and a `members` row. Re-running it
+rotates passwords rather than creating duplicates, so it doubles as the file you come back
+to when someone needs a new one.
+
+Nothing is emailed and nothing needs to be. That is the point: the reviewers can be
+working before SMTP is sorted out, and the addresses only have to be *theirs*, not
+*reachable*. Once mail does work, the same accounts accept a code as well — the password
+is a second door, not a second account.
+
 ### Making Supabase send a code instead of a link
 
 By default Supabase emails a magic link. Edit **both** templates under
@@ -246,7 +320,7 @@ Set **OTP expiry** to `600` seconds while you are there.
 
 ## Security
 
-The anon key is public by design — it ships in the page source. What protects the
+The publishable key is public by design — it ships in the page source. What protects the
 comments is the policy set in `supabase-auth-setup.sql`: every read and write requires a
 signed-in session **whose address is a row in `members`**, checked by Postgres on every
 request. That is why deleting a row revokes access straight away rather than whenever a
@@ -255,7 +329,7 @@ token happens to expire.
 Verify it rather than trusting it. With no session, this must return `[]`:
 
 ```
-curl 'https://YOUR-PROJECT.supabase.co/rest/v1/comments?select=*' -H 'apikey: YOUR-ANON-KEY'
+curl 'https://YOUR-PROJECT.supabase.co/rest/v1/comments?select=*' -H 'apikey: YOUR-PUBLISHABLE-KEY'
 ```
 
 If it returns rows, the SQL file has not been run and the login page is decoration.
@@ -275,6 +349,9 @@ with Access is the cheapest route — which is a hosting change, not a code chan
 | `assets/auth.css` | Login page and the "signed in as" chip |
 | `login.html` | The sign-in page — email, then the emailed code, or a password |
 | `supabase-auth-setup.sql` | The policies that make any of it real. Run once |
+| `supabase-signin-log.sql` | The `sign_ins` register and who may read it. Run once |
+| `supabase-team-users.sql` | The review team — accounts and passwords in one list |
+| `supabase-admin-user.sql` | Creates an admin with a password, or rotates one |
 | `assets/comments.js` | The widget — rail, pins, anchoring, composer |
 | `assets/comments.css` | Panel and pin styling, plus the print and small-screen rules |
 | `assets/comments-badges.js` | Homepage only: open-comment count per receipt |

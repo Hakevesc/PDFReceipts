@@ -6,8 +6,8 @@
 <title>Sign in — M-PESA Receipts</title>
 <!-- ?v= is a cache buster. Bump it whenever auth.js or auth.css changes, or
      browsers that already hold a copy will keep running the old one. -->
-<link rel="stylesheet" href="assets/auth.css?v=2">
-<script src="assets/auth.js?v=2" data-login></script>
+<link rel="stylesheet" href="assets/auth.css?v=4">
+<script src="assets/auth.js?v=4" data-login></script>
 </head>
 <body class="rc-login-body">
 
@@ -16,23 +16,32 @@
        onerror="this.style.display='none'">
 
   <h1>Review the receipts</h1>
-  <p class="rc-login-sub">Sign in with your Safaricom email</p>
+  <p class="rc-login-sub">Sign in with your username and password</p>
 
   <div class="rc-card">
 
-    <!-- Step 1 — email -->
-    <form id="emailStep" novalidate>
-      <input class="rc-field" id="email" type="email" name="email"
-             placeholder="Enter your Safaricom email address" autocomplete="email"
-             autocapitalize="off" spellcheck="false" required>
-      <button class="rc-submit" id="emailSubmit" type="submit">Continue with email</button>
-      <p class="rc-fine">Safaricom addresses only. We email you a code.</p>
+    <!-- Step 1 — username and password.
+         The accounts are made by hand in supabase-team-users.sql, so everyone
+         has a password before they ever open this page and nothing has to be
+         emailed for them to get in. That is why this is the first step rather
+         than the fallback it used to be: the mail is the part that breaks. -->
+    <form id="signinStep" novalidate>
+      <input class="rc-field" id="username" type="text" name="username"
+             placeholder="Username" autocomplete="username"
+             autocapitalize="off" autocorrect="off" spellcheck="false" required>
+      <input class="rc-field" id="password" type="password" name="password"
+             placeholder="Password" autocomplete="current-password" required>
+      <button class="rc-submit" id="signinSubmit" type="submit">Sign in</button>
       <div class="rc-alt">
-        <button class="rc-textlink" id="pwLink" type="button">I have a password instead</button>
+        <button class="rc-textlink" id="codeLink" type="button">Email me a code instead</button>
       </div>
     </form>
 
-    <!-- Step 2 — six-digit code -->
+    <!-- Step 2 — six-digit code.
+         Kept for the day custom SMTP is switched on, and for anyone who would
+         rather not hold a password. It grants nothing extra: the session it
+         produces is the same one the password produces, and every policy still
+         re-checks the members row. Access is the row, never the door. -->
     <form id="codeStep" novalidate hidden>
       <p class="rc-sent">We sent a <span id="codeLen">6</span>-digit code to <b id="sentTo"></b>.<br>It expires in 10 minutes.</p>
       <!-- Boxes are built from receiptAuth.config.codeLength so the page
@@ -40,26 +49,8 @@
       <div class="rc-code" id="codeBoxes"></div>
       <button class="rc-submit" id="codeSubmit" type="submit">Verify and continue</button>
       <div class="rc-alt">
-        <button class="rc-textlink" id="backBtn" type="button">Use a different email</button>
-        <button class="rc-textlink" id="codePwBtn" type="button">Use a password</button>
+        <button class="rc-textlink" id="backBtn" type="button">Back to sign in</button>
         <button class="rc-textlink" id="resendBtn" type="button">Resend code</button>
-      </div>
-    </form>
-
-    <!-- Step 2b — password.
-         The way in when the code email cannot be delivered: Supabase's own
-         mailer only sends to the project team, so until custom SMTP is on,
-         a colleague can be given a password in the dashboard instead. Same
-         session, same policies afterwards — access is still the members row,
-         never the way you signed in. -->
-    <form id="pwStep" novalidate hidden>
-      <p class="rc-sent">Signing in as <b id="pwWho"></b>.</p>
-      <input class="rc-field" id="password" type="password" name="password"
-             placeholder="Your password" autocomplete="current-password" required>
-      <button class="rc-submit" id="pwSubmit" type="submit">Sign in</button>
-      <div class="rc-alt">
-        <button class="rc-textlink" id="pwBackBtn" type="button">Use a different email</button>
-        <button class="rc-textlink" id="pwCodeBtn" type="button">Email me a code</button>
       </div>
     </form>
 
@@ -74,24 +65,19 @@
   'use strict';
 
   const auth       = window.receiptAuth;
-  const emailStep  = document.getElementById('emailStep');
+
+  const signinStep = document.getElementById('signinStep');
+  const userInput  = document.getElementById('username');
+  const pwInput    = document.getElementById('password');
+  const signinBtn  = document.getElementById('signinSubmit');
+  const codeLink   = document.getElementById('codeLink');
+
   const codeStep   = document.getElementById('codeStep');
-  const emailInput = document.getElementById('email');
-  const emailBtn   = document.getElementById('emailSubmit');
   const codeBtn    = document.getElementById('codeSubmit');
   const backBtn    = document.getElementById('backBtn');
   const resendBtn  = document.getElementById('resendBtn');
   const sentTo     = document.getElementById('sentTo');
   const note       = document.getElementById('note');
-
-  const pwStep     = document.getElementById('pwStep');
-  const pwInput    = document.getElementById('password');
-  const pwBtn      = document.getElementById('pwSubmit');
-  const pwLink     = document.getElementById('pwLink');
-  const pwBackBtn  = document.getElementById('pwBackBtn');
-  const pwCodeBtn  = document.getElementById('pwCodeBtn');
-  const codePwBtn  = document.getElementById('codePwBtn');
-  const pwWho      = document.getElementById('pwWho');
 
   // Supabase decides how long the code is; the page follows it rather than
   // assuming six. Mismatch here is the difference between a code that can be
@@ -127,13 +113,34 @@
   function clearNote() { note.hidden = true; }
 
   /* ------------------------------------------------------------- stepping
-     Three panels, one visible at a time. Kept in one place so a new step
-     can never leave an old one on screen. */
+     Two panels, one visible at a time. Kept in one place so a new step can
+     never leave an old one on screen. */
 
   function showStep(which) {
-    emailStep.hidden = which !== 'email';
-    codeStep.hidden  = which !== 'code';
-    pwStep.hidden    = which !== 'password';
+    signinStep.hidden = which !== 'signin';
+    codeStep.hidden   = which !== 'code';
+  }
+
+  /* -------------------------------------------------------------- who
+     The typed username turned into the address Supabase knows, and refused
+     here if it is not one we allow. Checked in Postgres too — this copy only
+     saves a wasted request. */
+
+  function readUsername() {
+    const value = auth.toEmail(userInput.value);
+    if (!value) {
+      say('Enter your username.');
+      userInput.focus();
+      return '';
+    }
+    if (!auth.isAllowedEmail(value)) {
+      say('That is not a Safaricom account. Use your username, or the whole ' +
+          '@safaricom.et address.');
+      userInput.focus();
+      userInput.select();
+      return '';
+    }
+    return value;
   }
 
   /* ------------------------------------------------------------ where to */
@@ -145,46 +152,74 @@
     return (auth && auth.safeNext(raw)) || 'index.html';
   }
 
-  /* -------------------------------------------------------------- step 1 */
+  /* ---------------------------------------------------------- the register
+     One row in public.sign_ins per successful sign-in, so the roster can
+     answer "who has actually been in" rather than only "who is on the list".
 
-  emailStep.addEventListener('submit', async function (e) {
+     The address is not sent — rc_log_sign_in() reads it out of the verified
+     session, so the browser cannot write a row under someone else's name. All
+     we hand over is which door was used.
+
+     Never allowed to stop a sign-in. If the call fails, the person is already
+     signed in and the only casualty is one missing line in a log. */
+
+  async function recordSignIn(method) {
+    try {
+      const client = await auth.getClient();
+      await client.rpc('rc_log_sign_in', {
+        p_method: method,
+        p_user_agent: String(navigator.userAgent || '').slice(0, 400)
+      });
+    } catch (_) { /* the register is bookkeeping, not a gate */ }
+  }
+
+  /* ------------------------------------------------- step 1 — the password */
+
+  signinStep.addEventListener('submit', async function (e) {
     e.preventDefault();
     clearNote();
 
-    const value = emailInput.value.trim().toLowerCase();
-    if (!value) { say('Enter your email address.'); emailInput.focus(); return; }
+    const who = readUsername();
+    if (!who) return;
 
-    // Checked here as well as in Postgres, purely so a wrong-domain address
-    // never burns an email or a rate-limit slot.
-    if (!auth.isAllowedEmail(value)) {
-      say('Use your Safaricom email address — it must end in @safaricom.et.');
-      emailInput.focus();
-      return;
+    const secret = pwInput.value;
+    if (!secret) { say('Enter your password.'); pwInput.focus(); return; }
+
+    signinBtn.disabled = true;
+    signinBtn.textContent = 'Signing in…';
+
+    try {
+      const client = await auth.getClient();
+      const { data, error } = await client.auth.signInWithPassword({
+        email: who, password: secret
+      });
+
+      if (error || !data || !data.session) {
+        signinBtn.disabled = false;
+        signinBtn.textContent = 'Sign in';
+        say(error ? friendly(error) : 'That password did not work. Try again.');
+        pwInput.value = '';
+        pwInput.focus();
+        return;
+      }
+      email = who;
+      await recordSignIn('password');
+      location.replace(destination());
+    } catch (err) {
+      signinBtn.disabled = false;
+      signinBtn.textContent = 'Sign in';
+      say('Could not reach the sign-in service. Check your connection and try again.');
     }
-
-    emailBtn.disabled = true;
-    emailBtn.textContent = 'Sending…';
-
-    const sent = await sendCode(value);
-
-    emailBtn.disabled = false;
-    emailBtn.textContent = 'Continue with email';
-    if (!sent) return;
-
-    email = value;
-    sentTo.textContent = value;
-    showStep('code');
-    say('Code sent. Check your inbox, and your spam folder.', 'ok');
-    startCooldown();
-    boxes[0].focus();
   });
+
+  /* ------------------------------------------------------ the other door */
 
   async function sendCode(address) {
     try {
       const client = await auth.getClient();
       const { error } = await client.auth.signInWithOtp({
         email: address,
-        options: { shouldCreateUser: true }
+        options: { shouldCreateUser: false }
       });
       if (error) { say(friendly(error)); return false; }
       return true;
@@ -194,7 +229,29 @@
     }
   }
 
-  /* -------------------------------------------------------------- step 2 */
+  codeLink.addEventListener('click', async function () {
+    clearNote();
+
+    const who = readUsername();
+    if (!who) return;
+
+    codeLink.disabled = true;
+    codeLink.textContent = 'Sending…';
+    const sent = await sendCode(who);
+    codeLink.disabled = false;
+    codeLink.textContent = 'Email me a code instead';
+    if (!sent) return;
+
+    email = who;
+    sentTo.textContent = who;
+    pwInput.value = '';
+    showStep('code');
+    say('Code sent. Check your inbox, and your spam folder.', 'ok');
+    startCooldown();
+    boxes[0].focus();
+  });
+
+  /* -------------------------------------------------- step 2 — the code */
 
   codeStep.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -231,6 +288,7 @@
         boxes[0].focus();
         return;
       }
+      await recordSignIn('code');
       location.replace(destination());
     } catch (err) {
       codeBtn.disabled = false;
@@ -306,99 +364,9 @@
     clearNote();
     email = '';
     boxes.forEach(function (b) { b.value = ''; });
-    showStep('email');
-    emailInput.focus();
-    emailInput.select();
-  });
-
-  /* ----------------------------------------------------------- password
-     A second door, for when the code email does not arrive. It grants
-     nothing extra: the session it produces is the same one the code
-     produces, and every policy still re-checks the members row. */
-
-  function toPassword() {
-    clearInterval(coolTimer);
-    clearNote();
-    pwWho.textContent = email;
-    pwInput.value = '';
-    showStep('password');
-    pwInput.focus();
-  }
-
-  pwLink.addEventListener('click', function () {
-    const value = emailInput.value.trim().toLowerCase();
-    if (!auth.isAllowedEmail(value)) {
-      clearNote();
-      say('Type your Safaricom email address first, then sign in with your password.');
-      emailInput.focus();
-      return;
-    }
-    email = value;
-    toPassword();
-  });
-
-  // Offered on the code step as well, since waiting on the code step is
-  // where you find out the mail is not coming.
-  codePwBtn.addEventListener('click', function () {
-    if (!email) return;
-    boxes.forEach(function (b) { b.value = ''; });
-    toPassword();
-  });
-
-  pwBackBtn.addEventListener('click', function () {
-    clearNote();
-    email = '';
-    pwInput.value = '';
-    showStep('email');
-    emailInput.focus();
-    emailInput.select();
-  });
-
-  pwCodeBtn.addEventListener('click', async function () {
-    if (!email) return;
-    clearNote();
-    pwInput.value = '';
-    pwCodeBtn.disabled = true;
-    const sent = await sendCode(email);
-    pwCodeBtn.disabled = false;
-    if (!sent) return;
-    sentTo.textContent = email;
-    showStep('code');
-    say('Code sent. Check your inbox, and your spam folder.', 'ok');
-    startCooldown();
-    boxes[0].focus();
-  });
-
-  pwStep.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    clearNote();
-
-    const secret = pwInput.value;
-    if (!secret) { say('Enter your password.'); pwInput.focus(); return; }
-
-    pwBtn.disabled = true;
-    pwBtn.textContent = 'Signing in…';
-
-    try {
-      const client = await auth.getClient();
-      const { data, error } = await client.auth.signInWithPassword({
-        email: email, password: secret
-      });
-
-      if (error || !data || !data.session) {
-        pwBtn.disabled = false;
-        pwBtn.textContent = 'Sign in';
-        say(error ? friendly(error) : 'That password did not work. Try again.');
-        pwInput.value = '';
-        pwInput.focus();
-        return;
-      }
-      location.replace(destination());
-    } catch (err) {
-      pwBtn.disabled = false;
-      pwBtn.textContent = 'Sign in';
-      say('Could not reach the sign-in service. Check your connection and try again.');
-    }
+    showStep('signin');
+    userInput.focus();
+    userInput.select();
   });
 
   /* ------------------------------------------------------------- errors */
@@ -410,39 +378,47 @@
   function friendly(error) {
     const raw = (error && error.message ? error.message : String(error)).toLowerCase();
 
+    // Wrong password, as opposed to a wrong code — both come back as "invalid".
+    // First, because it is now the common case: it is also what an account
+    // that was never created answers, which is why the wording covers both.
+    if (raw.indexOf('invalid login credentials') !== -1) {
+      return 'That username and password do not match, or the account does ' +
+             'not exist yet. Check them, or ask Mikias Dereje to set you up.';
+    }
+
     // Supabase's built-in mailer refuses any recipient who is not a member of
     // the project team. It is the usual reason one address gets codes and no
     // other does. Only custom SMTP cures it.
     if (raw.indexOf('not authorized') !== -1) {
       return 'The mail service refused to send to that address, because custom ' +
-             'SMTP is not switched on for this project. Use a password instead, ' +
-             'or ask Mikias Dereje to turn SMTP on.';
+             'SMTP is not switched on for this project. Sign in with your ' +
+             'password instead, or ask Mikias Dereje to turn SMTP on.';
     }
 
     // SMTP is configured but the handoff failed — a revoked Gmail app password
     // is the common cause.
     if (raw.indexOf('error sending') !== -1 || raw.indexOf('smtp') !== -1) {
       return 'The code could not be emailed — the mail service rejected it. ' +
-             'Use a password instead, and tell Mikias Dereje the SMTP password ' +
-             'needs checking.';
+             'Sign in with your password instead, and tell Mikias Dereje the ' +
+             'SMTP password needs checking.';
     }
 
     if (raw.indexOf('rate limit') !== -1 || raw.indexOf('too many') !== -1 ||
         raw.indexOf('for security purposes') !== -1) {
       return 'Too many attempts for now. Wait a minute, then try again.';
     }
+
+    // shouldCreateUser is false, so a code is only ever sent to an account
+    // that already exists. An unknown username lands here.
     if (raw.indexOf('signups not allowed') !== -1 ||
         raw.indexOf('signup is disabled') !== -1 ||
-        raw.indexOf('signup_disabled') !== -1) {
-      return 'This address has never signed in here and new sign-ups are ' +
-             'switched off. Ask Mikias Dereje to add you.';
+        raw.indexOf('signup_disabled') !== -1 ||
+        raw.indexOf('user not found') !== -1) {
+      return 'There is no account for that username yet. Ask Mikias Dereje ' +
+             'to add you.';
     }
     if (raw.indexOf('expired') !== -1) {
       return 'That code has expired. Send a new one.';
-    }
-    // Wrong password, as opposed to a wrong code — both come back as "invalid".
-    if (raw.indexOf('invalid login credentials') !== -1) {
-      return 'That email and password do not match. Check them, or ask for a code instead.';
     }
     if (raw.indexOf('email not confirmed') !== -1) {
       return 'That account has not been confirmed yet. Ask Mikias Dereje to ' +
@@ -473,7 +449,7 @@
     else if (a.error) say(a.error);
   });
 
-  emailInput.focus();
+  userInput.focus();
 })();
 </script>
 

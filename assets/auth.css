@@ -96,6 +96,9 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* Username and password sit one above the other on the first step. */
+.rc-field + .rc-field { margin-top: 12px; }
+
 .rc-field::placeholder { color: #AEAEB8; font-weight: 400; }
 
 .rc-field:focus {

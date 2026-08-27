@@ -27,9 +27,17 @@
   /* ---------------------------------------------------------------- config */
 
   const CONFIG = {
-    url: 'https://gqajqnjjvfdmufodliqc.supabase.co',
-    anonKey:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxYWpxbmpqdmZkbXVmb2RsaXFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0MDU3NTUsImV4cCI6MjEwMjk4MTc1NX0.k-kUdmD0TQ6RhPkwy3dYf7F825o7rf69n0SGklRViM4',
+    url: 'https://igtcubuthdipvckbilqr.supabase.co',
+
+    // The publishable key. Public by design — it ships in the page source and
+    // is meant to. It identifies the project, it does not grant anything: the
+    // policies decide that, on every request.
+    //
+    // sb_publishable_… is the current key format; the old anon key was a JWT
+    // and both still work. Whichever you paste must belong to the project in
+    // `url` above, or every request comes back 401.
+    anonKey: 'sb_publishable_pN_8blmu8mU5weUK2kJggg_pDUYx8mo',
+
     clientModule: 'https://esm.sh/@supabase/supabase-js@2',
 
     // Who may sign in. Mirrored by rc_allowed() in Postgres — this copy only
@@ -38,7 +46,14 @@
 
     loginPage: 'login.html',
     homePage: 'index.html',
-    storageKey: 'rc-auth',
+    // Bumped when the project changed. A browser still holding a session from
+    // the previous project would otherwise present a token the new one has
+    // never issued: getSession() hands it back because it is only reading
+    // localStorage, and the first real request fails in a way that reads as
+    // "could not check your access". A new key orphans those quietly and
+    // sends the person to the login page, which is the truth — the new
+    // project has never seen them.
+    storageKey: 'rc-auth-2',
 
     // How many digits the emailed code has. MUST match Supabase:
     // Authentication -> Sign In / Providers -> Email -> Email OTP Length.
@@ -85,6 +100,20 @@
     const at = String(email || '').trim().toLowerCase().split('@');
     if (at.length !== 2 || !at[0]) return false;
     return CONFIG.allowedDomains.indexOf(at[1]) !== -1;
+  }
+
+  // "danile" -> "danile@safaricom.et". People think of themselves as having a
+  // username; Supabase has only ever known addresses. This is the one place
+  // the two are reconciled, and it takes the domain from allowedDomains so it
+  // cannot drift away from the check that follows it.
+  //
+  // Anything already containing an @ is left alone, so a full address still
+  // works and an address from the wrong domain is still refused rather than
+  // quietly rewritten into the right one.
+  function toEmail(value) {
+    const v = String(value || '').trim().toLowerCase();
+    if (!v || v.indexOf('@') !== -1) return v;
+    return v + '@' + CONFIG.allowedDomains[0];
   }
 
   // mikias.dereje@safaricom.et -> "Mikias Dereje". Cosmetic only: the row's
@@ -165,6 +194,7 @@
     config: CONFIG,
     getClient,
     isAllowedEmail,
+    toEmail,
     displayNameFor,
     safeNext,
     signedIn: false,
